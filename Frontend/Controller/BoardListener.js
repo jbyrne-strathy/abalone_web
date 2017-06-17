@@ -141,9 +141,6 @@ var BoardListener = {
 					var moves = [];
 
 					var addMove = function (marble) {
-						if (!marble) {
-							throw "No marble";
-						}
 						console.log("addMove called on marble at " + marble.getSpace().getId());
 						var neighbours = Lines.getNeighbourSpaces(marble);
 						var targetSpace = BoardListener.moveMarbleTo(marble, neighbours, minChangeX, minChangeY);
@@ -171,7 +168,7 @@ var BoardListener = {
 						addMove(SelectedMarbles.get(1));
 						addMove(SelectedMarbles.get(2));
 					} catch (lessThanThreeSelected) {
-						/*console.log("less than three selected");*/
+						console.log("less than three selected");
 					}
 					SelectedMarbles.clearMarbles();
 					try {
@@ -331,15 +328,20 @@ var BoardListener = {
 				} else { // Not inline.
 					BoardListener.resetPushed();
 					var selected = SelectedMarbles.getMarbles();
-					for (i = 0; i < selected.length; i++) {
-						var marble = selected[i];
+					var checkMove = function (marble) {
 						// Identify which neighbour the marble is being dragged to.
 						targetSpace = BoardListener.draggingMarbleTo(marble, Lines.getNeighbourSpaces(marble));
 						// Identify if the marble is moving to a valid space.
 						if (targetSpace.getId().length >= 4 || targetSpace.getMarble() != null) {
 							BoardListener.isValidDrag = false;   // Single marble or Side-step can't push any other marble.
-							break;
 						}
+					}
+					try {
+						checkMove(SelectedMarbles.get(0));
+						checkMove(SelectedMarbles.get(1));
+						checkMove(SelectedMarbles.get(2));
+					} catch (lessThanThreeMarblesSelected) {
+						console.log("less than three selected");
 					}
 				}
 			}
