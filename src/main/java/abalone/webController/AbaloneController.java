@@ -1,4 +1,4 @@
-package abalone;
+package abalone.webController;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
