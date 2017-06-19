@@ -27,8 +27,7 @@ var Board = {
         window.stage.addChild(Board.background);
 
         // Draw the board shape.
-        var yOffset = Constants.yOffset;
-        var boardSpacing = Constants.halfBoardSpacing;
+        var yOffset = Constants.yOffset, boardSpacing = Constants.halfBoardSpacing;
         Board.board.graphics.setStrokeStyle(10);
         Board.board.graphics.beginFill(Constants.boardColor);
         Board.board.graphics.moveTo(boardSpacing*5, 0)
@@ -138,7 +137,7 @@ var Board = {
         Lines.create(Board.spaces, Board.offBoard);
 
         // Add the marbles
-		for (var space in layout) {
+		for (space in layout) {
 			var player = layout[space];
             if(player < 0 || player > 2){
                 throw "Invalid player number found in space " + space.getId() + ": " + player;
