@@ -1,7 +1,6 @@
 var BoardListener = {
 	player1: null,
 	player2: null,
-	currentPlayer: 1,
 	isHuman: true,
 	currentMarble: null,
 	draggingToSpace: null,
@@ -12,29 +11,19 @@ var BoardListener = {
 	isAlreadySelected: false,
 	isValidDrag: true,
 	isValidated: false,
-    create: function (gameState) {
-        if (gameState) {
-            Board.player1Score = gameState.player1Score;
-            Board.player2Score = gameState.player2Score;
-            BoardListener.currentPlayer = gameState.currentPlayer;
-        } else {
-            Board.player1Score = 0;
-            Board.player2Score = 0;
-            BoardListener.currentPlayer = 1;
-        }
-    },
-    addPlayers: function (player1, player2) {
-        BoardListener.player1 = player1;
-        BoardListener.player2 = player2;
+    create: function (player1, player2) {
+        BoardListener.player1 = player1 || HumanPlayer;
+        BoardListener.player2 = player2 || AIPlayer;
     },
 	pressMarble: function (marble, event) {
+	    if (!BoardListener.isHuman) return;
+	    // Only continue if human player is current.
 		BoardListener.dragged = false;
 		BoardListener.isAlreadySelected = false;
-		if(BoardListener.isHuman && !BoardListener.finished) {
+		if(!BoardListener.finished) {
             BoardListener.draggingToSpace = null;
             BoardListener.currentMarble = null;
-            var marbles = Board.getMarbles();
-			BoardListener.draggedFromX = event.stageX / window.isoScale;
+            BoardListener.draggedFromX = event.stageX / window.isoScale;
 			BoardListener.draggedFromY = event.stageY / window.isoScale;
 			if ((SelectedMarbles.contains(marble))) {
 				// Clicking or dragging a selected marble
@@ -43,7 +32,7 @@ var BoardListener = {
 			} else {
 				// Clicking or dragging a non-selected marble
 				BoardListener.isAlreadySelected = false;
-				if (BoardListener.currentPlayer == marble.getPlayer()) {
+				if (GameState.currentPlayer == marble.getPlayer()) {
 					// User clicked on their own marble.
 					BoardListener.currentMarble = marble;
 					if ( !(SelectedMarbles.isEmpty()) ) {
@@ -161,7 +150,7 @@ var BoardListener = {
 							marble.setSpace(targetSpace);
 							targetSpace.setMarble(marble);
 						}
-						return true;
+						/*return true;*/
 					}
 					try {
 						addMove(SelectedMarbles.get(0));
@@ -175,19 +164,12 @@ var BoardListener = {
 						addMove(PushedMarbles.get(0));
 						addMove(PushedMarbles.get(1));
 					} catch (lessThanTwoPushed) {
-						/*console.log("Less than two pushed");*/
+						console.log("Less than two pushed");
 					}
 					PushedMarbles.clearMarbles();
+
 					// Notify the backend player controller.
-					if (BoardListener.currentPlayer == 1) {
-						/*BoardListener.player1.makeMove(moves.toString());*/
-						BoardListener.currentPlayer = 2;
-						/*BoardListener.isHuman = player2.isHuman();*/
-					} else {
-						/*BoardListener.player2.makeMove(moves.toString());*/
-						BoardListener.currentPlayer = 1;
-						/*BoardListener.isHuman = player1.isHuman();*/
-					}
+					HumanPlayer.makeMove(moves);
 				}
 				BoardListener.dragged = false;
 				window.stage.update();
@@ -300,7 +282,7 @@ var BoardListener = {
 									pushMarble = null;
 								}
 								if (pushMarble != null) {
-									if (SelectedMarbles.size() == 2 || pushMarble.getPlayer() == BoardListener.currentPlayer) {
+									if (SelectedMarbles.size() == 2 || pushMarble.getPlayer() == GameState.currentPlayer) {
 										// 2 marbles can't push if 2 opponent marbles or single marble blocked by own piece.
 										BoardListener.isValidDrag = false;
 										BoardListener.resetPushed();

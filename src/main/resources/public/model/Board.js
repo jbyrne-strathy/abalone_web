@@ -1,43 +1,52 @@
 var Board = {
-	player1Name: "",
-    player1Score: 0,
-    player2Name: "",
-    player2Score: 0,
-
 	spaces:  {},
 	offBoard: {},
+	player1Score: null,
+	player1Name: null,
+	player2Score: null,
+	player2Name: null,
 
-    background: undefined,
-	board: undefined,
-
-	getMarbles: function () {
-		return Board.marbles;// Probably not needed. See Board.marbles at end of object.
-	},
-    create: function(layout){
-		// Fallback to standard layout if no layout provided.
-		if (!layout) {
-			layout = {"a1":2,"a2":2,"a3":2,"a4":2,"a5":2,"b1":2,"b2":2,"b3":2,"b4":2,"b5":2,"b6":2,"c1":0,"c2":0,"c3":2,"c4":2,"c5":2,"c6":0,"c7":0,"d1":0,"d2":0,"d3":0,"d4":0,"d5":0,"d6":0,"d7":0,"d8":0,"e1":0,"e2":0,"e3":0,"e4":0,"e5":0,"e6":0,"e7":0,"e8":0,"e9":0,"f1":0,"f2":0,"f3":0,"f4":0,"f5":0,"f6":0,"f7":0,"f8":0,"g1":0,"g2":0,"g3":1,"g4":1,"g5":1,"g6":0,"g7":0,"h1":1,"h2":1,"h3":1,"h4":1,"h5":1,"h6":1,"i1":1,"i2":1,"i3":1,"i4":1,"i5":1};
-		}
-
+	create: function(){
 		// Draw the background.
-        Board.background = new createjs.Shape();
-        Board.board = new createjs.Shape();
-        Board.background.graphics.beginFill(Constants.backgroundColor);
-        Board.background.graphics.drawRect(0, 0, Constants.boardWidth, Constants.boardHeight);
-        window.stage.addChild(Board.background);
+        var background = new createjs.Shape();
+        background.graphics.beginFill(Constants.backgroundColor);
+        background.graphics.drawRect(0, 0, Constants.boardWidth, Constants.boardHeight);
+        window.stage.addChild(background);
 
         // Draw the board shape.
+        var board = new createjs.Shape();
         var yOffset = Constants.yOffset, boardSpacing = Constants.halfBoardSpacing;
-        Board.board.graphics.setStrokeStyle(10);
-        Board.board.graphics.beginFill(Constants.boardColor);
-        Board.board.graphics.moveTo(boardSpacing*5, 0)
-        Board.board.graphics.lineTo(boardSpacing*15, 0)
-        Board.board.graphics.lineTo(Constants.boardWidth, Constants.boardHeight/2)
-        Board.board.graphics.lineTo(boardSpacing*15, Constants.boardHeight)
-        Board.board.graphics.lineTo(boardSpacing*5, Constants.boardHeight)
-        Board.board.graphics.lineTo(0, Constants.boardHeight/2)
-        Board.board.graphics.lineTo(boardSpacing*5, 0);
-        window.stage.addChild(Board.board);
+        board.graphics.setStrokeStyle(10);
+        board.graphics.beginFill(Constants.boardColor);
+        board.graphics.moveTo(boardSpacing*5, 0)
+        board.graphics.lineTo(boardSpacing*15, 0)
+        board.graphics.lineTo(Constants.boardWidth, Constants.boardHeight/2)
+        board.graphics.lineTo(boardSpacing*15, Constants.boardHeight)
+        board.graphics.lineTo(boardSpacing*5, Constants.boardHeight)
+        board.graphics.lineTo(0, Constants.boardHeight/2)
+        board.graphics.lineTo(boardSpacing*5, 0);
+        window.stage.addChild(board);
+
+        // Draw the player names and scores.
+        player1Name = new createjs.Text(BoardListener.player1.name, Constants.textFont, Constants.textColor);
+        player1Name.x = Constants.fullBoardSpacing - (player1Name.getBounds().width / 2);
+        player1Name.y = Constants.halfBoardSpacing;
+        window.stage.addChild(player1Name);
+
+        player2Name = new createjs.Text(BoardListener.player2.name, Constants.textFont, Constants.textColor);
+        player2Name.x = Constants.boardWidth - Constants.fullBoardSpacing  - (player1Name.getBounds().width / 2);
+        player2Name.y = Constants.halfBoardSpacing;
+        window.stage.addChild(player2Name);
+
+        player1Score = new createjs.Text(GameState.player1Score.toString(), Constants.textFont, Constants.textColor);
+        player1Score.x = Constants.fullBoardSpacing;
+        player1Score.y = Constants.fullBoardSpacing;
+        window.stage.addChild(player1Score);
+
+        player2Score = new createjs.Text(GameState.player2Score.toString(), Constants.textFont, Constants.textColor);
+        player2Score.x = Constants.boardWidth - Constants.fullBoardSpacing;
+        player2Score.y = Constants.fullBoardSpacing;
+        window.stage.addChild(player2Score);
 
         // Draw the spaces.
         Board.spaces.a1 = new Space("a1", 6*boardSpacing, yOffset);
@@ -137,15 +146,14 @@ var Board = {
         Lines.create(Board.spaces, Board.offBoard);
 
         // Add the marbles
-		for (space in layout) {
-			var player = layout[space];
+		for (space in GameState.spaces) {
+			var player = GameState.spaces[space];
             if(player < 0 || player > 2){
                 throw "Invalid player number found in space " + space.getId() + ": " + player;
             }
             if(player != 0){
 				var marble = new Marble(Board.spaces[space], player);
 				Board.spaces[Board.spaces[space].getId()].setMarble(marble);
-                /*Board.marbles.push(marble); Probably not needed as was only used for identifying clicked marble in Java. */
             }
         }
     }

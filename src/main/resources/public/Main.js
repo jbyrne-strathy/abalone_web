@@ -1,5 +1,5 @@
 var stage, isoScale;
-function configureWindow(){
+function configureWindow () {
 	var w = window.innerWidth
 			|| document.documentElement.clientWidth
 			|| document.body.clientWidth,
@@ -12,13 +12,21 @@ function configureWindow(){
 	stage.update();
 }
 
-function init(){
+function init () {
 	stage = new createjs.Stage("demoCanvas");
 
 	window.onresize = configureWindow;
 	configureWindow();
 
-    BoardListener.create(null);
+    HumanPlayer.opponent = AIPlayer;
+    HumanPlayer.name = "James";
+    HumanPlayer.playerNumber = 1;
+
+    AIPlayer.opponent = HumanPlayer;
+    AIPlayer.playerNumber = 2;
+
+    GameState.create(null);
+    BoardListener.create(HumanPlayer, AIPlayer);
     Board.create(null);
 
 	stage.update();
