@@ -40,3 +40,7 @@ Space.prototype.getMarble = function () {
 Space.prototype.setMarble = function (marble) {
     this.marble = marble;
 }
+
+Space.prototype.isOffBoard = function () {
+    return this.id.indexOf("out") != -1;
+}
