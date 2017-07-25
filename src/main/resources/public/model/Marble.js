@@ -77,7 +77,9 @@ Marble.prototype.move = function (xTransform, yTransform) {
 }
 
 Marble.prototype.remove = function () {
-    this.getSpace().setMarble(null);
+    if (this.getSpace().getMarble() === this) {
+        this.getSpace().setMarble(null);
+    }
     this.unsetSpace();
     window.stage.removeChild(this.circle);
     window.stage.update();

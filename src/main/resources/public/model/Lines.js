@@ -21,18 +21,21 @@ var Lines = {
 		};
 		return checkLine(0) || checkLine(1) || checkLine(2) || checkLine(3) || checkLine(4) || checkLine(5) || checkLine(6) || checkLine(7) || checkLine(8) || checkLine(9) || checkLine(10) || checkLine(11) || checkLine(12) || checkLine(13) || checkLine(14) || checkLine(15) || checkLine(16) || checkLine(17) || checkLine(18) || checkLine(19) || checkLine(20) || checkLine(21) || checkLine(22) || checkLine(23) || checkLine(24) || checkLine(25) || checkLine(26);
 	},
-	getNeighbourSpaces: function (marble) {
+	getNeighbourSpaces: function (space) { // Can take either a marble or space.
 		var neighbours = [];
+		if (space.getSpace && typeof space.getSpace == "function") {
+		    space = space.getSpace();
+		}
 		var checkLine = function (line) {
-			var index = line.indexOf(marble.getSpace());
-            if(index > 0) {
+			var index = line.indexOf(space);
+            if (index > 0) {
                 neighbours.push(line[(index - 1)]);
             }
-            if(index < line.length-1) {
+            if (index < line.length-1) {
                 neighbours.push(line[(index + 1)]);
             }
 		}
-        var onLines = Lines.getLinesForSpace(marble.getSpace());
+        var onLines = Lines.getLinesForSpace(space);
 		checkLine(onLines[0]);
 		checkLine(onLines[1]);
 		checkLine(onLines[2]);

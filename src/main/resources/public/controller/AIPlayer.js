@@ -1,18 +1,110 @@
 var AIPlayer = {
     isHuman: false,
     playerNumber: 0,
-    name: "Hugh",
+    name: "Monkey",
     opponent: null,
     gameState: null,
     makeMove: function (moves) {
-        // TODO Choose next move to make.
-        // TODO Animate move on board.
-        // TODO Pass back control to opponent.
+        // Animate move on board.
+        var movingMarbles = [];
+        var from = [];
+        var to = [];
+        $.each(moves, function (i, marbleMove) {
+            $.each(Board.spaces, function (i, space) {
+                if (space.id == marbleMove.from) {
+                    movingMarbles.push(space.getMarble());
+                    from.push(space);
+                    return false; // No need to continue searching spaces.
+                }
+            } );
+        } );
+        // Fill "to" list.
+        $.each(moves, function (i, marbleMove) {
+            var spaces = {};
+            if ( !Board.spaces[marbleMove.to].isOffBoard() ) {
+                spaces = Board.spaces;
+            } else {
+                spaces = Board.offBoard;
+            }
+            $.each(spaces, function (i, space) {
+                if (space.id == marbleMove.to) {
+                    to.push(space);
+                    return false; // No need to continue searching spaces.
+                }
+            } );
+        } );
+        if (to[0] === undefined) {
+            var paused = true;
+        }
+        var xChange = (to[0].getX() - from[0].getX())/30;
+        var yChange = (to[0].getY() - from[0].getY())/30;
+        // Move the marbles
+        var count = 0;
+        var timer = window.setInterval(function() {
+            if (count == 30) {
+                $.each(movingMarbles, function (i, marble) {
+                    marble.setPos( to[i].getX(), to[i].getY() );
+                    if(marble.getSpace().getMarble() === marble) {
+                        marble.getSpace().setMarble(null);
+                    }
+                    marble.setSpace(to[i]);
+                    to[i].setMarble(marble);
+                } );
+                window.clearInterval(timer);
+            } else {
+                $.each(movingMarbles, function (i, marble) {
+                    marble.move(xChange, yChange);
+                } );
+                count++;
+            }
+        }, 30 );
+
+        // Update game state with move
+        var marbles = [];
+        // Clear the spaces previously occupied by each marble.
+        $.each(moves, function (i, move) {
+            marbles.push( GameState.spaces[move.from] );
+            GameState.removeMarble(move.from);
+        } );
+        // Now set the moved marbles to their new spaces.
+        $.each(moves, function (i, move) {
+            if (Board.offBoard[move.to] !== undefined) {
+                // When marble pushed off, increment the other player's score and strength.
+                var pushedOutPlayer = marbles.shift();
+                if(pushedOutPlayer == 1) {
+                    GameState.player2Score++;
+                    Board.player2Score.text = GameState.player2Score.toString();
+                } else if(pushedOutPlayer == 2) {
+                    GameState.player1Score++;
+                    Board.player1Score.text = GameState.player1Score.toString();
+                }
+            } else {
+                // Put marble in its new space.
+                var movedPlayer = marbles.shift();
+                GameState.setMarble(move.to, movedPlayer);
+            }
+        } );
+        console.log(GameState.spaces);
+
+        // Pass back control to opponent.
+        if(GameState.currentPlayer == 1){
+            GameState.currentPlayer = 2;
+        } else if(GameState.currentPlayer == 2){
+            GameState.currentPlayer = 1;
+        }
+        if(GameState.player1Score == 6){
+            GameState.winner = 1;
+        } else if(GameState.player2Score == 6){
+            GameState.winner = 2;
+        }
+        AIPlayer.opponent.update(moves);
     },
     update: function (moves, gameStateHash) {
         BoardListener.currentPlayer = AIPlayer.playerNumber;
         BoardListener.isHuman = false;
-        AIPlayer.chooseMove();
+        var moves = AIPlayer.findAvailableMoves();
+        AIPlayer.makeMove( moves[Math.floor( Math.random() * (moves.length + 1) )] );
+        //console.log("Moves: ", moves);
     },
     findAvailableMoves: function () {
         var moves = [];
@@ -22,98 +114,53 @@ var AIPlayer = {
                 if (GameState.getMarbleAt( space ) == GameState.currentPlayer) {
                     // Moves in positive direction
                     if (i > 2) {
-                        moves = moves.concat( identifyInlineMoves(space, line[i+1], [ line[i-1], line[i-2] ]) );
+                        moves = moves.concat( AIPlayer.identifyInlineMoves(space, line[i+1], [ line[i-1], line[i-2] ]) );
+                        moves = moves.concat( AIPlayer.identifySidestepMoves(space, line[i+1]) );
                         if (i < line.length - 3) {
-                            moves = moves.concat( identifyPushingMoves(space, [ line[i+1], line[i+2], line[i+3] ], [ line[i-1], line[i-2] ]) );
+                            moves = moves.concat( AIPlayer.identifyPushingMoves(space, [ line[i+1], line[i+2], line[i+3] ], [ line[i-1], line[i-2] ]) );
                         } else if (i == line.length - 3) {
-                            moves = moves.concat( identifyPushingMoves(space, [ line[i+1], line[i+2] ], [ line[i-1], line[i-2] ]) );
+                            moves = moves.concat( AIPlayer.identifyPushingMoves(space, [ line[i+1], line[i+2] ], [ line[i-1], line[i-2] ]) );
                         }
                     } else if (i == 2) {
-                        moves = moves.concat( identifyInlineMoves(space, line[i+1], [ line[i-1] ]) );
+                        moves = moves.concat( AIPlayer.identifyInlineMoves(space, line[i+1], [ line[i-1] ]) );
+                        moves = moves.concat( AIPlayer.identifySidestepMoves(space, line[i+1]) );
                         if (i <= line.length - 3) {
-                            moves = moves.concat( identifyPushingMoves(space, [ line[i+1], line[i+2] ], [ line[i-1] ]) );
+                            moves = moves.concat( AIPlayer.identifyPushingMoves(space, [ line[i+1], line[i+2] ], [ line[i-1] ]) );
                         }
                     } else {
-                        moves = moves.concat( identifyInlineMoves(space, line[i+1], []) );
+                        moves = moves.concat( AIPlayer.identifyInlineMoves(space, line[i+1], []) );
+                        moves = moves.concat( AIPlayer.identifySidestepMoves(space, line[i+1]) );
                     }
                     // Moves in negative direction
                     if (i < line.length - 3) {
-                        moves = moves.concat( identifyInlineMoves(space, line[i-1], [ line[i+1], line[i+2] ]) );
+                        moves = moves.concat( AIPlayer.identifyInlineMoves(space, line[i-1], [ line[i+1], line[i+2] ]) );
+                        moves = moves.concat( AIPlayer.identifySidestepMoves(space, line[i-1]) );
                         if (i > 2) {
-                            moves = moves.concat( identifyPushingMoves(space, [ line[i-1], line[i-2], line[i-3] ], [ line[i+1], line[i+2] ]) );
+                            moves = moves.concat( AIPlayer.identifyPushingMoves(space, [ line[i-1], line[i-2], line[i-3] ], [ line[i+1], line[i+2] ]) );
                         } else if (i == 2) {
-                            moves = moves.concat( identifyPushingMoves(space, [ line[i-1], line[i-2] ], [ line[i+1], line[i+2] ]) );
+                            moves = moves.concat( AIPlayer.identifyPushingMoves(space, [ line[i-1], line[i-2] ], [ line[i+1], line[i+2] ]) );
                         }
                     } else if (i == line.length - 3) {
-                        moves = moves.concat( identifyInlineMoves(space, line[i-1], [ line[i+1] ]) );
+                        moves = moves.concat( AIPlayer.identifyInlineMoves(space, line[i-1], [ line[i+1] ]) );
+                        moves = moves.concat( AIPlayer.identifySidestepMoves(space, line[i-1]) );
                         if (i >= 2) {
-                            moves = moves.concat( identifyPushingMoves(space, [ line[i-1], line[i-2] ], [ line[i+1] ]) );
+                            moves = moves.concat( AIPlayer.identifyPushingMoves(space, [ line[i-1], line[i-2] ], [ line[i+1] ]) );
                         }
                     } else {
-                        moves = moves.concat( identifyInlineMoves(space, line[i-1], []) );
+                        moves = moves.concat( AIPlayer.identifyInlineMoves(space, line[i-1], []) );
+                        moves = moves.concat( AIPlayer.identifySidestepMoves(space, line[i-1]) );
                     }
                 }
             } );
         } );
-        // Identify all possible side-step moves.
-//        for(String[] line : iGameState.LINES) {
-//            // Find all single-marble moves which will move off of this line.
-//            List<JSONObject> offLines = new LinkedList<>();
-//            for(int i = 1; i < line.length-1; i++) { // Check each space.  Never moving from an out space.
-//                for (JSONObject move : singleMoves) { // Check each move.
-//                    if (move.getString("from").equals(line[i])) { // A move can be made from this space
-//                        if (!move.getString("to").equals(line[i-1]) && !move.getString("to").equals(line[i+1])) {
-//                            offLines.add(move); // Move is to a different line.
-//                        }
-//                    }
-//                }
-//            }
-//
-//            // Identify all 2- and 3-marble side-step moves from the offLines list.
-//            for(int i = 0; i < offLines.size(); i++){
-//                String iFrom = offLines.get(i).getString("from");
-//                String iTo = offLines.get(i).getString("to");
-//                for(int j = i+1; j < offLines.size(); j++){
-//                    String jFrom = offLines.get(j).getString("from");
-//                    String jTo = offLines.get(j).getString("to");
-//                    if(!iTo.equals(jTo) && areNeighbours(line, iFrom, jFrom)){
-//                        if(getLineForSpaces(iTo, jTo) != null) {
-//                            if(areNeighbours(getLineForSpaces(iTo, jTo), iTo, jTo)){
-//                                JSONArray sideStep = new JSONArray();
-//                                sideStep.put(offLines.get(i));
-//                                sideStep.put(offLines.get(j));
-//                                moves.add(sideStep);
-//                                for(int k = j+1; k < offLines.size(); k++){
-//                                    String kFrom = offLines.get(k).getString("from");
-//                                    String kTo = offLines.get(k).getString("to");
-//                                    if( !kTo.equals(jTo) && !kTo.equals(iTo) && !kFrom.equals(jFrom) && !kFrom.equals(iFrom)
-//                                            && ( areNeighbours(line, iFrom, kFrom) || areNeighbours(line, jFrom, kFrom) ) ){
-//                                        if( getLineForSpaces(iTo, kTo) != null && getLineForSpaces(jTo, kTo) != null ) {
-//                                            if( areNeighbours(getLineForSpaces(iTo, kTo), iTo, kTo)
-//                                                    || areNeighbours(getLineForSpaces(jTo, kTo), jTo, kTo)) {
-//                                                sideStep = new JSONArray();
-//                                                sideStep.put(offLines.get(i));
-//                                                sideStep.put(offLines.get(j));
-//                                                sideStep.put(offLines.get(k));
-//                                                moves.add(sideStep);
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
         return moves;
     },
     identifyInlineMoves: function (space, nextSpace, neighbours) {
-        var result: [];
+        var result = [];
         if ( !nextSpace.isOffBoard() && GameState.getMarbleAt(nextSpace) == 0 ) {
             var move1 = {"from": space.id, "to": nextSpace.id};
             var move2, move3;
-            result.push(move1);
+            result.push([move1]);
             try {
                 if (GameState.getMarbleAt(neighbours[0]) == GameState.currentPlayer) {
                     move2 = {"from": neighbours[0].id, "to": space.id};
@@ -124,7 +171,7 @@ var AIPlayer = {
                     }
                 }
             } catch (lessThan2Neighbours) {
-                console.log("IdentifyInlineMoves: " + lessThan2Neighbours.message);
+                //console.log("IdentifyInlineMoves: " + lessThan2Neighbours.message);
                 // Just continue. Not an actual problem.
             }
         }
@@ -132,22 +179,22 @@ var AIPlayer = {
     },
     identifyPushingMoves: function (space, pushedSpaces, neighbours) {
         result = [];
-        if ( GameState.getMarbleAt( pushedSpaces[0] ) == opponent.playerNumber ) {
+        if ( GameState.getMarbleAt( pushedSpaces[0] ) == AIPlayer.opponent.playerNumber ) {
             if ( GameState.getMarbleAt( pushedSpaces[1] ) == 0 ) { // Pushing a single marble.
                 // 2 pushing 1.
                 if ( GameState.getMarbleAt( neighbours[0] ) == GameState.currentPlayer ) {
-                    var move1 = {"from": neighbours[0].id, "to": space.id};
+                    var move1 = {"from": pushedSpaces[0].id, "to": pushedSpaces[1].id};
                     var move2 = {"from": space.id, "to": pushedSpaces[0].id};
-                    var move3 = {"from": pushedSpaces[0].id, "to": pushedSpaces[1].id};
+                    var move3 = {"from": neighbours[0].id, "to": space.id};
                     result.push([move1, move2, move3]);
                     // 3 pushing 1.
-                    if ( GameState.getMarbleAt( neighbours[1] ) == GameState.currentPlayer ) {
-                        var move4 = {"from": line[i+2].id, "to": line[i+1].id};
+                    if ( neighbours[1] && GameState.getMarbleAt( neighbours[1] ) == GameState.currentPlayer ) {
+                        var move4 = {"from": neighbours[1].id, "to": neighbours[0].id};
                         result.push([move1, move2, move3, move4]);
                     }
                 }
-            } else if ( GameState.getMarbleAt( pushedSpaces[1]) == opponent.playerNumber
-                        && GameState.getMarbleAt( pushedSpaces[2] ) == 0 ) { // Pushing two marbles.
+            } else if ( GameState.getMarbleAt( pushedSpaces[1]) == AIPlayer.opponent.playerNumber
+                        && pushedSpaces[2] && GameState.getMarbleAt( pushedSpaces[2] ) == 0 ) { // Pushing two marbles.
                 if ( GameState.getMarbleAt( neighbours[0] ) == GameState.currentPlayer
                     && GameState.getMarbleAt( neighbours[1] ) == GameState.currentPlayer) {
                     var move1 = {"from": neighbours[1].id, "to": neighbours[0].id};
@@ -161,7 +208,34 @@ var AIPlayer = {
         }
         return result;
     },
-    identifySidestepMoves: function () {
-        // TODO
+    identifySidestepMoves: function (space, target) {
+        var result = [];
+        if ( !space.isOffBoard() && !target.isOffBoard() && GameState.getMarbleAt(target) == 0 ) {
+            $.each(Lines.getNeighbourSpaces(space), function (i, spaceNeighbour) {
+                if (!spaceNeighbour.isOffBoard() && GameState.getMarbleAt(spaceNeighbour) == AIPlayer.playerNumber) {
+                    $.each(Lines.getNeighbourSpaces(target), function (j, targetNeighbour) {
+                        if (!targetNeighbour.isOffBoard() && GameState.getMarbleAt(targetNeighbour) == 0 &&
+                                Lines.getNeighbourSpaces(spaceNeighbour).indexOf(targetNeighbour) != -1) {
+                            // 2-marble sidestep.
+                            var move1 = {"from": space.id, "to": target.id};
+                            var move2 = {"from": spaceNeighbour.id, "to": targetNeighbour.id};
+                            result.push([move1, move2]);
+                            // Check for 3-marble sidestep.
+                            var spaceLine = Lines.getLineForSpaces(space, spaceNeighbour);
+                            var targetLine = Lines.getLineForSpaces(target, targetNeighbour);
+                            var direction = spaceLine.indexOf(spaceNeighbour) - spaceLine.indexOf(space);
+                            var nextSpace = spaceLine.indexOf(spaceNeighbour) + direction;
+                            var nextTarget = targetLine.indexOf(targetNeighbour) + direction;
+                            if ( GameState.getMarbleAt(spaceLine[nextSpace]) == AIPlayer.playerNumber &&
+                                    GameState.getMarbleAt(targetLine[nextTarget]) == 0 ) {
+                                var move3 = {"from": spaceLine[nextSpace].id, "to": targetLine[nextTarget].id};
+                                result.push([move1, move2, move3]);
+                            }
+                        }
+                    } );
+                }
+            } );
+        }
+        return result;
     }
 }

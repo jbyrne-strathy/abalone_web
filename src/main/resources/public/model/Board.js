@@ -28,25 +28,25 @@ var Board = {
         window.stage.addChild(board);
 
         // Draw the player names and scores.
-        player1Name = new createjs.Text(BoardListener.player1.name, Constants.textFont, Constants.textColor);
-        player1Name.x = Constants.fullBoardSpacing - (player1Name.getBounds().width / 2);
-        player1Name.y = Constants.halfBoardSpacing;
-        window.stage.addChild(player1Name);
+        Board.player1Name = new createjs.Text(BoardListener.player1.name, Constants.textFont, Constants.textColor);
+        Board.player1Name.x = Constants.fullBoardSpacing - (Board.player1Name.getBounds().width / 2);
+        Board.player1Name.y = Constants.halfBoardSpacing;
+        window.stage.addChild(Board.player1Name);
 
-        player2Name = new createjs.Text(BoardListener.player2.name, Constants.textFont, Constants.textColor);
-        player2Name.x = Constants.boardWidth - Constants.fullBoardSpacing  - (player1Name.getBounds().width / 2);
-        player2Name.y = Constants.halfBoardSpacing;
-        window.stage.addChild(player2Name);
+        Board.player2Name = new createjs.Text(BoardListener.player2.name, Constants.textFont, Constants.textColor);
+        Board.player2Name.x = Constants.boardWidth - Constants.fullBoardSpacing  - (Board.player1Name.getBounds().width / 2);
+        Board.player2Name.y = Constants.halfBoardSpacing;
+        window.stage.addChild(Board.player2Name);
 
-        player1Score = new createjs.Text(GameState.player1Score.toString(), Constants.textFont, Constants.textColor);
-        player1Score.x = Constants.fullBoardSpacing;
-        player1Score.y = Constants.fullBoardSpacing;
-        window.stage.addChild(player1Score);
+        Board.player1Score = new createjs.Text(GameState.player1Score.toString(), Constants.textFont, Constants.textColor);
+        Board.player1Score.x = Constants.fullBoardSpacing;
+        Board.player1Score.y = Constants.fullBoardSpacing;
+        window.stage.addChild(Board.player1Score);
 
-        player2Score = new createjs.Text(GameState.player2Score.toString(), Constants.textFont, Constants.textColor);
-        player2Score.x = Constants.boardWidth - Constants.fullBoardSpacing;
-        player2Score.y = Constants.fullBoardSpacing;
-        window.stage.addChild(player2Score);
+        Board.player2Score = new createjs.Text(GameState.player2Score.toString(), Constants.textFont, Constants.textColor);
+        Board.player2Score.x = Constants.boardWidth - Constants.fullBoardSpacing;
+        Board.player2Score.y = Constants.fullBoardSpacing;
+        window.stage.addChild(Board.player2Score);
 
         // Draw the spaces.
         Board.spaces.a1 = new Space("a1", 6*boardSpacing, yOffset);

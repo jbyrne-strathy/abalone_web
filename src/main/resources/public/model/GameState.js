@@ -20,7 +20,7 @@ var GameState = {
         }
     },
     getMarbleAt: function (space) {
-        return GameState.spaces[space];
+        return GameState.spaces[space.id];
     },
     removeMarble: function (space) {
         GameState.spaces[space] = 0;

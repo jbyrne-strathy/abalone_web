@@ -7,21 +7,21 @@ var HumanPlayer = {
     makeMove: function(moves) {
         var marbles = [];
         // Clear the spaces previously occupied by each marble.
-        moves.forEach( function (move) {
-            marbles.push( GameState.getMarbleAt(move.from) );
+        $.each(moves, function (i, move) {
+            marbles.push( GameState.spaces[move.from] );
             GameState.removeMarble(move.from);
         } );
         // Now set the moved marbles to their new spaces.
-        moves.forEach( function (move) {
-            if(move.to.length >= 4){
+        $.each(moves, function (i, move) {
+            if(Board.offBoard[move.to] !== undefined){
                 // When marble pushed off, increment the other player's score and strength.
                 var pushedOutPlayer = marbles.shift();
                 if(pushedOutPlayer == 1) {
                     GameState.player2Score++;
-                    Board.player2Score.Text = GameState.player2Score.toString();
+                    Board.player2Score.text = GameState.player2Score.toString();
                 } else if(pushedOutPlayer == 2) {
                     GameState.player1Score++;
-                    Board.player1Score.Text = GameState.player1Score.toString();
+                    Board.player1Score.text = GameState.player1Score.toString();
                 }
             } else {
                 // Put marble in its new space.
@@ -29,15 +29,17 @@ var HumanPlayer = {
                 GameState.setMarble(move.to, movedPlayer);
             }
         } );
+        console.log(GameState.spaces);
+
         if(GameState.currentPlayer == 1){
             GameState.currentPlayer = 2;
         } else if(GameState.currentPlayer == 2){
             GameState.currentPlayer = 1;
         }
         if(GameState.player1Score == 6){
-            GameState.setWinner(1);
+            GameState.winner = 1;
         } else if(GameState.player2Score == 6){
-            GameState.setWinner(2);
+            GameState.winner = 2;
         }
         HumanPlayer.opponent.update(moves);
     },

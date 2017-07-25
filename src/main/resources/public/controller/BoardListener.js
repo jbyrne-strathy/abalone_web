@@ -130,20 +130,20 @@ var BoardListener = {
 					var moves = [];
 
 					var addMove = function (marble) {
-						console.log("addMove called on marble at " + marble.getSpace().getId());
+						//console.log("addMove called on marble at " + marble.getSpace().getId());
 						var neighbours = Lines.getNeighbourSpaces(marble);
 						var targetSpace = BoardListener.moveMarbleTo(marble, neighbours, minChangeX, minChangeY);
-						console.log("neighbours: ", neighbours.toString());
-						console.log("targetSpace: ", targetSpace);
+						//console.log("neighbours: ", neighbours.toString());
+						//console.log("targetSpace: ", targetSpace);
 						var move = {};
 						move.from = marble.getSpace().getId();
 						move.to = targetSpace.getId();
 						moves.push(move);
-						if (targetSpace.getId().length > 2) {
-							console.log("Gone to offboard? " + targetSpace.getId());
+						if (targetSpace.isOffBoard()) {
+							//console.log("Gone to offboard? " + targetSpace.getId());
 							marble.remove();
 						} else {
-							console.log("Player " + marble.getPlayer() + ": " + marble.getSpace().getId() + " -> " + targetSpace.getId());
+							//console.log("Player " + marble.getPlayer() + ": " + marble.getSpace().getId() + " -> " + targetSpace.getId());
 							if(marble.getSpace().getMarble() === marble) {
 								marble.getSpace().setMarble(null);
 							}
@@ -157,14 +157,14 @@ var BoardListener = {
 						addMove(SelectedMarbles.get(1));
 						addMove(SelectedMarbles.get(2));
 					} catch (lessThanThreeSelected) {
-						console.log("less than three selected");
+						//console.log("less than three selected");
 					}
 					SelectedMarbles.clearMarbles();
 					try {
 						addMove(PushedMarbles.get(0));
 						addMove(PushedMarbles.get(1));
 					} catch (lessThanTwoPushed) {
-						console.log("Less than two pushed");
+						//console.log("Less than two pushed");
 					}
 					PushedMarbles.clearMarbles();
 
@@ -220,11 +220,11 @@ var BoardListener = {
 				BoardListener.resetMarbles();
 			}
 
-			if (targetSpace.getId().length >=4) {
+			if (targetSpace.isOffBoard()) {
 				// Dragging to an offboard space isn't allowed.
 				BoardListener.isValidDrag = false;
 			} else if (BoardListener.isValidDrag && BoardListener.draggingToSpace && !BoardListener.isValidated) {
-				/*console.log("Validating move.");*/
+				/*//console.log("Validating move.");*/
 				BoardListener.isValidated = true;
 				// Find line which current marble is being dragged on.
 				var line = Lines.getLineForSpaces(BoardListener.currentMarble.getSpace(), targetSpace);
@@ -247,7 +247,7 @@ var BoardListener = {
 						var nextIndex = line.indexOf(thisMarble.getSpace()) + direction;
 						var pushSpace = line[nextIndex];
 						// Marble can't be pushed out.
-						if (pushSpace.getId().length > 3) {
+						if (pushSpace.isOffBoard()) {
 							BoardListener.isValidDrag = false;
 							break;
 						}
@@ -314,7 +314,7 @@ var BoardListener = {
 						// Identify which neighbour the marble is being dragged to.
 						targetSpace = BoardListener.draggingMarbleTo(marble, Lines.getNeighbourSpaces(marble));
 						// Identify if the marble is moving to a valid space.
-						if (targetSpace.getId().length >= 4 || targetSpace.getMarble() != null) {
+						if (targetSpace.isOffBoard() || targetSpace.getMarble() != null) {
 							BoardListener.isValidDrag = false;   // Single marble or Side-step can't push any other marble.
 						}
 					}
@@ -323,7 +323,7 @@ var BoardListener = {
 						checkMove(SelectedMarbles.get(1));
 						checkMove(SelectedMarbles.get(2));
 					} catch (lessThanThreeMarblesSelected) {
-						console.log("less than three selected");
+						//console.log("less than three selected");
 					}
 				}
 			}
