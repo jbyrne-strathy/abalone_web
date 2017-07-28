@@ -1,6 +1,4 @@
-var BoardListener = {
-	player1: null,
-	player2: null,
+var MouseListener = {
 	isHuman: true,
 	currentMarble: null,
 	draggingToSpace: null,
@@ -11,30 +9,26 @@ var BoardListener = {
 	isAlreadySelected: false,
 	isValidDrag: true,
 	isValidated: false,
-    create: function (player1, player2) {
-        BoardListener.player1 = player1 || HumanPlayer;
-        BoardListener.player2 = player2 || AIPlayer;
-    },
 	pressMarble: function (marble, event) {
-	    if (!BoardListener.isHuman) return;
+	    if (!MouseListener.isHuman) return;
 	    // Only continue if human player is current.
-		BoardListener.dragged = false;
-		BoardListener.isAlreadySelected = false;
-		if(!BoardListener.finished) {
-            BoardListener.draggingToSpace = null;
-            BoardListener.currentMarble = null;
-            BoardListener.draggedFromX = event.stageX / window.isoScale;
-			BoardListener.draggedFromY = event.stageY / window.isoScale;
+		MouseListener.dragged = false;
+		MouseListener.isAlreadySelected = false;
+		if(!MouseListener.finished) {
+            MouseListener.draggingToSpace = null;
+            MouseListener.currentMarble = null;
+            MouseListener.draggedFromX = event.stageX / window.isoScale;
+			MouseListener.draggedFromY = event.stageY / window.isoScale;
 			if ((SelectedMarbles.contains(marble))) {
 				// Clicking or dragging a selected marble
-				BoardListener.currentMarble = marble;
-				BoardListener.isAlreadySelected = true;
+				MouseListener.currentMarble = marble;
+				MouseListener.isAlreadySelected = true;
 			} else {
 				// Clicking or dragging a non-selected marble
-				BoardListener.isAlreadySelected = false;
+				MouseListener.isAlreadySelected = false;
 				if (GameState.currentPlayer == marble.getPlayer()) {
 					// User clicked on their own marble.
-					BoardListener.currentMarble = marble;
+					MouseListener.currentMarble = marble;
 					if ( !(SelectedMarbles.isEmpty()) ) {
 						//Get lines which marble is on.
 						var onLines = Lines.getLinesForSpace(marble.getSpace());
@@ -81,20 +75,20 @@ var BoardListener = {
 			}
 		}
 
-		if (!BoardListener.isAlreadySelected && BoardListener.currentMarble) {
-			SelectedMarbles.addMarble(BoardListener.currentMarble);
+		if (!MouseListener.isAlreadySelected && MouseListener.currentMarble) {
+			SelectedMarbles.addMarble(MouseListener.currentMarble);
 		}
-		BoardListener.isValidDrag = true;
-		BoardListener.isValidated = false;
+		MouseListener.isValidDrag = true;
+		MouseListener.isValidated = false;
 	},
 	releaseMarble: function (marble, event) {
-		if (!BoardListener.dragged) { // Have clicked a marble
-			if (BoardListener.isAlreadySelected && SelectedMarbles.contains(marble)) {
+		if (!MouseListener.dragged) { // Have clicked a marble
+			if (MouseListener.isAlreadySelected && SelectedMarbles.contains(marble)) {
 				if (SelectedMarbles.size() < 3 || SelectedMarbles.get(2) === marble) {
 					SelectedMarbles.removeMarble(marble);
 				} else { // Do not deselect only middle marble.
 					var line = null;
-					if (BoardListener.currentMarble) {
+					if (MouseListener.currentMarble) {
 						line = Lines.getLineForSpaces(SelectedMarbles.get(0).getSpace(), SelectedMarbles.get(1).getSpace());
 					}
 					var indices = [];
@@ -102,20 +96,20 @@ var BoardListener = {
 					indices.push(line.indexOf(SelectedMarbles.get(1).getSpace()));
 					indices.push(line.indexOf(SelectedMarbles.get(2).getSpace()));
 					indices.sort();
-					var currentIndex = line.indexOf(BoardListener.currentMarble.getSpace());
+					var currentIndex = line.indexOf(MouseListener.currentMarble.getSpace());
 					if (indices[1] != currentIndex) { // Marble is at either end of the row, so deselect.
-						SelectedMarbles.removeMarble(BoardListener.currentMarble);
+						SelectedMarbles.removeMarble(MouseListener.currentMarble);
 					}
 				}
 			} else {
-				BoardListener.dragged = false;
+				MouseListener.dragged = false;
 			}
-		} else if (BoardListener.isValidDrag && BoardListener.draggingToSpace) {// Have dragged a marble.
-			if(BoardListener.isHuman && !BoardListener.finished) {
+		} else if (MouseListener.isValidDrag && MouseListener.draggingToSpace) {// Have dragged a marble.
+			if(MouseListener.isHuman && !MouseListener.finished) {
 				var currentX = marble.getSpace().getX();
 				var currentY = marble.getSpace().getY();
-				var targetX = BoardListener.draggingToSpace.getX();
-				var targetY = BoardListener.draggingToSpace.getY();
+				var targetX = MouseListener.draggingToSpace.getX();
+				var targetY = MouseListener.draggingToSpace.getY();
 				var minChangeX = Math.abs(targetX - currentX) / 2;
 				var minChangeY = Math.abs(targetY - currentY) / 2;
 				var dropPointX = event.stageX / window.isoScale;
@@ -124,7 +118,7 @@ var BoardListener = {
 				var yChange = Math.abs(dropPointY - currentY);
 				if (xChange < minChangeX || yChange < minChangeY) {
 					// Marble wasn't dragged far enough from its starting point.
-					BoardListener.resetMarbles();
+					MouseListener.resetMarbles();
 				} else {
 					// Identify the new space for each moving marble
 					var moves = [];
@@ -132,7 +126,7 @@ var BoardListener = {
 					var addMove = function (marble) {
 						//console.log("addMove called on marble at " + marble.getSpace().getId());
 						var neighbours = Lines.getNeighbourSpaces(marble);
-						var targetSpace = BoardListener.moveMarbleTo(marble, neighbours, minChangeX, minChangeY);
+						var targetSpace = MouseListener.moveMarbleTo(marble, neighbours, minChangeX, minChangeY);
 						//console.log("neighbours: ", neighbours.toString());
 						//console.log("targetSpace: ", targetSpace);
 						var move = {};
@@ -171,22 +165,22 @@ var BoardListener = {
 					// Notify the backend player controller.
 					HumanPlayer.makeMove(moves);
 				}
-				BoardListener.dragged = false;
+				MouseListener.dragged = false;
 				window.stage.update();
 			}
 		}
 	},
     dragMarble: function (marble, event) {
-		if(BoardListener.isHuman && !BoardListener.finished && BoardListener.currentMarble) {
-			BoardListener.dragged = true;
+		if(MouseListener.isHuman && !MouseListener.finished && MouseListener.currentMarble) {
+			MouseListener.dragged = true;
 			// Convert physical drag dimensions to marble's abstract dimensions.
 			var draggedToX = event.stageX / window.isoScale;
 			var draggedToY = event.stageY / window.isoScale;
-			var xMove = draggedToX - BoardListener.draggedFromX;
-			var yMove = draggedToY - BoardListener.draggedFromY;
+			var xMove = draggedToX - MouseListener.draggedFromX;
+			var yMove = draggedToY - MouseListener.draggedFromY;
 			marble.move(xMove, yMove);
 			// Correct xMove and yMove to fit line.
-			var targetSpace = BoardListener.draggingMarbleTo(marble, Lines.getNeighbourSpaces(marble));
+			var targetSpace = MouseListener.draggingMarbleTo(marble, Lines.getNeighbourSpaces(marble));
 			var diffX = targetSpace.getX() - marble.getSpace().getX();
 			var diffY = targetSpace.getY() - marble.getSpace().getY();
 			yMove = (diffY * Math.abs(xMove)) / Math.abs(diffX);
@@ -211,23 +205,23 @@ var BoardListener = {
 			// Identify globally, which neighbour the marble is being dragged to.
 			// But only once the marble is moved a certain distance.
 			// This avoids confusion with initial mouse juddering.
-			if (!BoardListener.draggingToSpace && (Math.abs(xMove) > Constants.minXMove || Math.abs(yMove) > Constants.minYMove) ) {
-				BoardListener.draggingToSpace = targetSpace;
-			} else if (BoardListener.draggingToSpace && BoardListener.draggingToSpace != targetSpace){
-				BoardListener.isValidDrag = false;
-				BoardListener.isValidated = false;
-				BoardListener.draggingToSpace = null;
-				BoardListener.resetMarbles();
+			if (!MouseListener.draggingToSpace && (Math.abs(xMove) > Constants.minXMove || Math.abs(yMove) > Constants.minYMove) ) {
+				MouseListener.draggingToSpace = targetSpace;
+			} else if (MouseListener.draggingToSpace && MouseListener.draggingToSpace != targetSpace){
+				MouseListener.isValidDrag = false;
+				MouseListener.isValidated = false;
+				MouseListener.draggingToSpace = null;
+				MouseListener.resetMarbles();
 			}
 
 			if (targetSpace.isOffBoard()) {
 				// Dragging to an offboard space isn't allowed.
-				BoardListener.isValidDrag = false;
-			} else if (BoardListener.isValidDrag && BoardListener.draggingToSpace && !BoardListener.isValidated) {
+				MouseListener.isValidDrag = false;
+			} else if (MouseListener.isValidDrag && MouseListener.draggingToSpace && !MouseListener.isValidated) {
 				/*//console.log("Validating move.");*/
-				BoardListener.isValidated = true;
+				MouseListener.isValidated = true;
 				// Find line which current marble is being dragged on.
-				var line = Lines.getLineForSpaces(BoardListener.currentMarble.getSpace(), targetSpace);
+				var line = Lines.getLineForSpaces(MouseListener.currentMarble.getSpace(), targetSpace);
 				// Are the selected marbles being dragged in-line?
 				var inline = true;
 				if (SelectedMarbles.size() == 1) {
@@ -239,7 +233,7 @@ var BoardListener = {
 					}
 				}
 				// Get direction that the marble is being dragged.
-				var direction = line.indexOf(targetSpace) - line.indexOf(BoardListener.currentMarble.getSpace());
+				var direction = line.indexOf(targetSpace) - line.indexOf(MouseListener.currentMarble.getSpace());
 				if (inline) { // Drag in-line.
 					var selected = SelectedMarbles.getMarbles();
 					for (i = 0; i < selected.length; i++) {
@@ -248,19 +242,19 @@ var BoardListener = {
 						var pushSpace = line[nextIndex];
 						// Marble can't be pushed out.
 						if (pushSpace.isOffBoard()) {
-							BoardListener.isValidDrag = false;
+							MouseListener.isValidDrag = false;
 							break;
 						}
 						// Identify if marbles are being pushed.
 						var pushMarble = pushSpace.getMarble();
 						if (pushMarble == null) {
-							BoardListener.resetPushed();
+							MouseListener.resetPushed();
 							break;
 						} else {
-							if (pushMarble.getPlayer() == BoardListener.currentMarble.getPlayer()) {
+							if (pushMarble.getPlayer() == MouseListener.currentMarble.getPlayer()) {
 								// Don't move to space occupied by own unselected marble.
 								if (!SelectedMarbles.contains(pushMarble)) {
-									BoardListener.isValidDrag = false;
+									MouseListener.isValidDrag = false;
 									break;
 								}
 							} else {
@@ -269,7 +263,7 @@ var BoardListener = {
 									var pushIndex = line.indexOf(pushMarble.getSpace());
 									var heldIndex = line.indexOf(PushedMarbles.get(0).getSpace());
 									if (pushIndex > (heldIndex + 1) || pushIndex < (heldIndex - 1)){
-										BoardListener.resetPushed();
+										MouseListener.resetPushed();
 									}
 								}
 								// Push opponent's marbles if less in-line.
@@ -284,8 +278,8 @@ var BoardListener = {
 								if (pushMarble != null) {
 									if (SelectedMarbles.size() == 2 || pushMarble.getPlayer() == GameState.currentPlayer) {
 										// 2 marbles can't push if 2 opponent marbles or single marble blocked by own piece.
-										BoardListener.isValidDrag = false;
-										BoardListener.resetPushed();
+										MouseListener.isValidDrag = false;
+										MouseListener.resetPushed();
 										break;
 									} else {
 										PushedMarbles.addMarble(pushMarble);
@@ -298,8 +292,8 @@ var BoardListener = {
 										}
 										if (pushMarble != null) {
 											// Either 3 opponent marbles or 2 blocked by own marble.
-											BoardListener.isValidDrag = false;
-											BoardListener.resetPushed();
+											MouseListener.isValidDrag = false;
+											MouseListener.resetPushed();
 											break;
 										}
 									}
@@ -308,14 +302,14 @@ var BoardListener = {
 						}
 					}
 				} else { // Not inline.
-					BoardListener.resetPushed();
+					MouseListener.resetPushed();
 					var selected = SelectedMarbles.getMarbles();
 					var checkMove = function (marble) {
 						// Identify which neighbour the marble is being dragged to.
-						targetSpace = BoardListener.draggingMarbleTo(marble, Lines.getNeighbourSpaces(marble));
+						targetSpace = MouseListener.draggingMarbleTo(marble, Lines.getNeighbourSpaces(marble));
 						// Identify if the marble is moving to a valid space.
 						if (targetSpace.isOffBoard() || targetSpace.getMarble() != null) {
-							BoardListener.isValidDrag = false;   // Single marble or Side-step can't push any other marble.
+							MouseListener.isValidDrag = false;   // Single marble or Side-step can't push any other marble.
 						}
 					}
 					try {
@@ -328,8 +322,8 @@ var BoardListener = {
 				}
 			}
 
-			if (!BoardListener.isValidDrag) {
-				BoardListener.resetMarbles();
+			if (!MouseListener.isValidDrag) {
+				MouseListener.resetMarbles();
 			}
         }
     },
@@ -376,7 +370,7 @@ var BoardListener = {
             marble.setPos(marble.getSpace().getX(), marble.getSpace().getY());
         }
 		SelectedMarbles.draw();
-        BoardListener.resetPushed();
+        MouseListener.resetPushed();
     },
 	resetPushed: function ( ) {
 		var pushed = PushedMarbles.getMarbles();

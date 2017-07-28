@@ -1,8 +1,5 @@
 <html>
 	<head>
-		<!-- Get libraries from CDNs -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-		<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
 		<!--<script>
 			window.fbAsyncInit = function() {
 				FB.init({
@@ -18,17 +15,20 @@
 			 var js, fjs = d.getElementsByTagName(s)[0];
 			 if (d.getElementById(id)) {return;}
 			 js = d.createElement(s); js.id = id;
-			 js.src = "//connect.facebook.net/en_GB/sdk.js";
+			 js.src = "./fb-en_gb.js";
 			 fjs.parentNode.insertBefore(js, fjs);
 			}(document, 'script', 'facebook-jssdk'));
 		</script>-->
 
 		<!-- For the public server. -->
+		<!--<script src="./libraries.js"></script>-->
 		<!--<script src="./abalone.js"></script>-->
 		<!--<script src="./controllers.js"></script>-->
 		<!--<script src="./model.js"></script>-->
 
 		<!-- For development. -->
+		<script src="./libraries/jquery.min.js"></script>
+		<script src="./libraries/easeljs-0.8.2.min.js"></script>
 		<script src="./model/Board.js"></script>
 		<script src="./model/Space.js"></script>
 		<script src="./model/Marble.js"></script>
@@ -36,7 +36,8 @@
 		<script src="./model/PushedMarbles.js"></script>
 		<script src="./model/Lines.js"></script>
 		<script src="./model/GameState.js"></script>
-		<script src="./controller/BoardListener.js"></script>
+		<script src="./controller/MouseListener.js"></script>
+		<script src="./controller/PlayerUtils.js"></script>
 		<script src="./controller/HumanPlayer.js"></script>
 		<script src="./controller/RemotePlayer.js"></script>
 		<script src="./controller/AIPlayer.js"></script>

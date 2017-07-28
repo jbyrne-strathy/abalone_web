@@ -25,13 +25,13 @@ function Marble (space, player) {
         .drawCircle(0, 0, Constants.marbleRadius);
     var self = this;
     this.circle.on("pressmove", function (event){
-        BoardListener.dragMarble(self, event);
+        MouseListener.dragMarble(self, event);
     });
     this.circle.on("pressup", function (event) {
-        BoardListener.releaseMarble(self, event);
+        MouseListener.releaseMarble(self, event);
     });
     this.circle.on("mousedown", function (event) {
-        BoardListener.pressMarble(self, event);
+        MouseListener.pressMarble(self, event);
     });
     window.stage.addChild(this.circle);
     return this;
@@ -76,6 +76,13 @@ Marble.prototype.move = function (xTransform, yTransform) {
     window.stage.update();
 }
 
+Marble.prototype.animate = function (xTransform, yTransform) {
+    this.circle.x += xTransform;
+    this.circle.y += yTransform;
+    //console.log(this.circle.x + ", " + this.circle.y);
+    window.stage.update();
+}
+
 Marble.prototype.remove = function () {
     if (this.getSpace().getMarble() === this) {
         this.getSpace().setMarble(null);
@@ -84,5 +91,3 @@ Marble.prototype.remove = function () {
     window.stage.removeChild(this.circle);
     window.stage.update();
 }
-
-

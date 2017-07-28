@@ -6,7 +6,11 @@ var Board = {
 	player2Score: null,
 	player2Name: null,
 
-	create: function(){
+	create: function(player1, player2){
+	    if (!player1 || !player2) {
+	        player1 = HumanPlayer;
+	        player2 = AIPlayer;
+	    }
 		// Draw the background.
         var background = new createjs.Shape();
         background.graphics.beginFill(Constants.backgroundColor);
@@ -28,12 +32,12 @@ var Board = {
         window.stage.addChild(board);
 
         // Draw the player names and scores.
-        Board.player1Name = new createjs.Text(BoardListener.player1.name, Constants.textFont, Constants.textColor);
+        Board.player1Name = new createjs.Text(player1.name, Constants.textFont, Constants.textColor);
         Board.player1Name.x = Constants.fullBoardSpacing - (Board.player1Name.getBounds().width / 2);
         Board.player1Name.y = Constants.halfBoardSpacing;
         window.stage.addChild(Board.player1Name);
 
-        Board.player2Name = new createjs.Text(BoardListener.player2.name, Constants.textFont, Constants.textColor);
+        Board.player2Name = new createjs.Text(player2.name, Constants.textFont, Constants.textColor);
         Board.player2Name.x = Constants.boardWidth - Constants.fullBoardSpacing  - (Board.player1Name.getBounds().width / 2);
         Board.player2Name.y = Constants.halfBoardSpacing;
         window.stage.addChild(Board.player2Name);

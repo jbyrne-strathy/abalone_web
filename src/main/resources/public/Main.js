@@ -26,8 +26,7 @@ function init () {
     AIPlayer.playerNumber = 2;
 
     GameState.create(null);
-    BoardListener.create(HumanPlayer, AIPlayer);
-    Board.create(null);
+    Board.create(HumanPlayer, AIPlayer);
 
 	stage.update();
 }
