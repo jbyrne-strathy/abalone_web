@@ -19,7 +19,7 @@ function init () {
 	configureWindow();
 
     HumanPlayer.opponent = AIPlayer;
-    HumanPlayer.name = "James";
+    HumanPlayer.name = "Human";
     HumanPlayer.playerNumber = 1;
 
     AIPlayer.opponent = HumanPlayer;

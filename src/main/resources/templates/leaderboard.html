@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+        <title>Abalone Leaderboard</title>
+        <meta name="description" content=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="/css/normalize.css"/>
+        <link rel="stylesheet" href="/css/main.css"/>
+        <script src="/scripts/libraries/modernizr-2.8.3.min.js"></script>
+        <script src="/scripts/libraries/plugins.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <a href="/">Go to Lobby</a>
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Sign Out"/>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Name</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Points Scored</th>
+                    <th>Points Lost</th>
+                    <th>Rank Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="leader : ${leaders}">
+                    <td th:text="${leader.position}"></td>
+                    <td><span th:text="${leader.photo}"/><span th:text="${leader.name}"/></td>
+                    <td th:text="${leader.wins}"></td>
+                    <td th:text="${leader.losses}"></td>
+                    <td th:text="${leader.pointsScored}"></td>
+                    <td th:text="${leader.pointsLost}"></td>
+                    <td th:text="${leader.rankPoints}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+        <title>Abalone Lobby</title>
+        <meta name="description" content=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="/css/normalize.css"/>
+        <link rel="stylesheet" href="/css/main.css"/>
+        <script src="/scripts/libraries/modernizr-2.8.3.min.js"></script>
+        <script src="/scripts/libraries/plugins.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <a href="/leaderboard">Go to Leaderboard</a>
+        <form action="/"><!-- TODO Rest request to get and invite friends to play. Only available for facebook users. -->
+            <button type="submit">Invite friends</button>
+        </form>
+        <a href="/game">Start an AI Game</a>
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Sign Out"/>
+        </form>
+        <ul>
+            <li th:each="player : ${players}" onclick=""><!-- TODO onclick: send invite to selected player. -->
+                <img th:src="${player.photo}"/>
+                <span th:text="${player.name}"/>
+            </li>
+        </ul>
+    </body>
+</html>
