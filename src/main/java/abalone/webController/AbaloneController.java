@@ -21,6 +21,11 @@ public class AbaloneController {
     private ConnectionRepository connectionRepository;
 
     @GetMapping(value = "/")
+    public String home(Model model) {
+        return "redirect:/lobby";
+    }
+
+    @GetMapping(value="/lobby")
     public String lobby(Model model) {
 //        if ( isFacebookNotConnected() ) {
 //            return "redirect:/connect/facebook";
@@ -30,12 +35,12 @@ public class AbaloneController {
 //        model.addAttribute("lang", facebook.userOperations().getUserProfile().getLocale());
         List<User> players = new ArrayList<>(); // TODO Get list of available opponents
         model.addAttribute("players", players);
-        return "lobby";
+        return "/lobby";
     }
 
     @GetMapping(value = "/login")
     public String login(Model model) {
-        return "login";
+        return "/login";
     }
 
     @GetMapping(value = "/game")
@@ -43,13 +48,13 @@ public class AbaloneController {
 //        if ( isFacebookNotConnected() ) {
 //            return "redirect:/connect/facebook";
 //        }
-        return "game";
+        return "/game";
     }
 
     @GetMapping(value = "/leaderboard")
     public String leaderboard(Model model) {
         model.addAttribute("leaderboard", "TODO"); //TODO Get the leaderboard
-        return "leaderboard";
+        return "/leaderboard";
     }
 
     private boolean isFacebookNotConnected() {
