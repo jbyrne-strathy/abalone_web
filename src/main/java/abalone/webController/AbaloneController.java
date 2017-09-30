@@ -1,12 +1,18 @@
 package abalone.webController;
 
+import abalone.bean.CreatePlayerBean;
+import abalone.database.repository.PlayerRepository;
+import abalone.database.table.Player;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
@@ -41,6 +47,32 @@ public class AbaloneController {
     @GetMapping(value = "/login")
     public String login(Model model) {
         return "/login";
+    }
+
+    @GetMapping(value = "/createAccount")
+    public String createAccount(Model model) {
+        return "/createAccount";
+    }
+
+    @Autowired
+    private PlayerRepository playerRepository;
+
+    @PostMapping(value = "/createAccount")
+    public String processAccount(CreatePlayerBean playerBean, ModelMap model) {
+        int count = playerRepository.count( playerBean.getUsername() );
+        System.out.println("Count: " + count);
+        if ( count > 0 ) {
+            return "redirect:/createAccount?error";
+        }
+        Player newPlayer = new Player( playerBean.getUsername(), playerBean.getPassword() );
+        System.out.println(newPlayer.getId());
+        System.out.println(newPlayer.getUsername());
+        System.out.println(newPlayer.getPassword());
+        System.out.println(newPlayer.getEnabled());
+        System.out.println(newPlayer.getRole());
+
+        playerRepository.save( newPlayer );
+        return "redirect:/login";
     }
 
     @GetMapping(value = "/game")
