@@ -1,6 +1,6 @@
 package abalone.webController;
 
-import abalone.bean.CreatePlayerBean;
+import abalone.dto.CreatePlayerDto;
 import abalone.database.repository.PlayerRepository;
 import abalone.database.table.Player;
 import lombok.AllArgsConstructor;
@@ -58,7 +58,7 @@ public class AbaloneController {
     private PlayerRepository playerRepository;
 
     @PostMapping(value = "/createAccount")
-    public String processAccount(CreatePlayerBean playerBean, ModelMap model) {
+    public String processAccount(CreatePlayerDto playerBean, ModelMap model) {
         int count = playerRepository.count( playerBean.getUsername() );
         System.out.println("Count: " + count);
         if ( count > 0 ) {

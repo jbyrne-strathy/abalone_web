@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import javax.sql.DataSource;
 
+import static abalone.security.AbalonePasswordEncoder.PASSWORD_ENCODER;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -35,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication().dataSource(dataSource)
+                .passwordEncoder(PASSWORD_ENCODER)
                 .usersByUsernameQuery("SELECT username, password, enabled FROM player WHERE username=?")
                 .authoritiesByUsernameQuery("SELECT username, role FROM player WHERE username=?");
     }

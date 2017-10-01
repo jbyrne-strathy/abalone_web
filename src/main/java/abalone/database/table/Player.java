@@ -11,13 +11,16 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
+import static abalone.security.AbalonePasswordEncoder.PASSWORD_ENCODER;
+
 @Entity
 @NoArgsConstructor
 public class Player {
+
     public Player(String username, String password) {
         this.id = UUID.randomUUID().toString();
         this.username = username;
-        this.password = password;
+        this.password = PASSWORD_ENCODER.encode(password);
         this.enabled = true;
         this.role = "ROLE_USER";
     }
