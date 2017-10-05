@@ -15,7 +15,7 @@
         <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <a href="/">Go to Lobby</a>
+        <p><a href="/game">Go to Lobby</a></p>
         <form th:action="@{/logout}" method="post">
             <input type="submit" value="Sign Out"/>
         </form>
@@ -26,20 +26,20 @@
                     <th>Name</th>
                     <th>Wins</th>
                     <th>Losses</th>
-                    <th>Points Scored</th>
-                    <th>Points Lost</th>
-                    <th>Rank Points</th>
+                    <th>Marbles Scored</th>
+                    <th>Marbles Lost</th>
+                    <th>Points</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="leader : ${leaders}">
-                    <td th:text="${leader.position}"></td>
-                    <td><span th:text="${leader.photo}"/><span th:text="${leader.name}"/></td>
-                    <td th:text="${leader.wins}"></td>
-                    <td th:text="${leader.losses}"></td>
-                    <td th:text="${leader.pointsScored}"></td>
-                    <td th:text="${leader.pointsLost}"></td>
-                    <td th:text="${leader.rankPoints}"></td>
+                <tr th:each="player : ${players}">
+                    <td th:text="${player.position}"></td>
+                    <td><span th:text="${player.photo}"/><span th:text="${player.name}"/></td>
+                    <td th:text="${player.wins}"></td>
+                    <td th:text="${player.losses}"></td>
+                    <td th:text="${player.pointsScored}"></td>
+                    <td th:text="${player.pointsLost}"></td>
+                    <td th:text="${player.rankPoints}"></td>
                 </tr>
             </tbody>
         </table>

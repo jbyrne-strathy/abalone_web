@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
         <meta charset="UTF-8"/>
         <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-        <title>Abalone Lobby</title>
+        <title>Abalone Login</title>
         <meta name="description" content=""/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <link rel="stylesheet" href="/css/normalize.css"/>
@@ -15,19 +16,16 @@
         <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <a href="/leaderboard">Go to Leaderboard</a>
-        <form action="/"><!-- TODO Rest request to get and invite friends to play. Only available for facebook users. -->
-            <button type="submit">Invite friends</button>
+        <div th:if="${param.error}">
+            Username already exists.
+        </div>
+        <form th:action="@{/createAccount}" method="post">
+            <div><label> User Name : <input type="text" name="username"/> </label></div>
+            <div><label> Password: <input type="password" name="password"/> </label></div>
+            <div><input type="submit" value="Sign In"/></div>
         </form>
-        <a href="/game">Start an AI Game</a>
-        <form th:action="@{/logout}" method="post">
-            <input type="submit" value="Sign Out"/>
-        </form>
-        <ul>
-            <li th:each="player : ${players}" onclick=""><!-- TODO onclick: send invite to selected player. -->
-                <img th:src="${player.photo}"/>
-                <span th:text="${player.name}"/>
-            </li>
-        </ul>
+        <div>
+            <a href="/login">Go to login</a>
+        </div>
     </body>
 </html>
