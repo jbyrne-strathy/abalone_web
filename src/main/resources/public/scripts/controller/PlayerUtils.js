@@ -27,7 +27,7 @@ var PlayerUtils = {
             } );
         } );
         if (to[0] === undefined) {
-            var paused = true;
+            alert("to[0] is undefined!"); // Just to catch an error in debugging. Remove this.
         }
         var xChange = (to[0].getX() - from[0].getX())/30;
         var yChange = (to[0].getY() - from[0].getY())/30;

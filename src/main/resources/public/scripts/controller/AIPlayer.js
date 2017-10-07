@@ -12,7 +12,12 @@ var AIPlayer = {
         MouseListener.currentPlayer = AIPlayer.playerNumber;
         MouseListener.isHuman = false;
         var moves = AIPlayer.findAvailableMoves();
-        AIPlayer.makeMove( moves[Math.floor( Math.random() * (moves.length + 1) )] );
+        var index = Math.floor( Math.random() * moves.length );
+        var move = moves[index];
+        if (move === undefined) {
+            alert("Move is undefined!"); // Just to catch an error in debugging. Remove this.
+        }
+        AIPlayer.makeMove( move );
         //console.log("Moves: ", moves);
     },
     findAvailableMoves: function () {

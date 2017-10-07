@@ -53,6 +53,7 @@
 		<script src="/scripts/controller/AIPlayer.js"></script>
 		<script src="/scripts/Constants.js"></script>
 		<script src="/scripts/Main.js"></script>
+		<meta id="me" th:content="${user}"/>
 		<!--<meta id="player1" th:content="${player1}}"/>
 		<meta id="player2" th:content="${player2}}"/>-->
 	</head>
@@ -61,11 +62,12 @@
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 		<![endif]-->
 		<div id="lobby">
+			<p>Welcome, <span th:text="${user}"></span></p>
 			<p><a href="/leaderboard">Go to Leaderboard</a></p>
 			<!--<form action="/">&lt;!&ndash; TODO Rest request to get and invite friends to play. Only available for facebook users. &ndash;&gt;
                 <button type="submit">Invite friends</button>
             </form>-->
-			<p><a href="/game">Start an AI Game</a></p>
+			<p><button onclick="startAiGame()">Start an AI Game</button></p>
 			<form th:action="@{/logout}" method="post">
 				<input type="submit" value="Sign Out"/>
 			</form>

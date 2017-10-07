@@ -12,21 +12,47 @@ function configureWindow () {
 	stage.update();
 }
 
-function init () {
-	stage = new createjs.Stage("demoCanvas");
+function startGame (myNumber, opponentNumber, opponentName) {
+    stage = new createjs.Stage("demoCanvas");
 
 	window.onresize = configureWindow;
 	configureWindow();
 
-    HumanPlayer.opponent = AIPlayer;
-    HumanPlayer.name = "Human";
-    HumanPlayer.playerNumber = 1;
+    HumanPlayer.opponent = Remoteplayer;
+    HumanPlayer.name = $("#me")[0].content;
+    HumanPlayer.playerNumber = myNumber;
 
+    RemotePlayer.opponent = HumanPlayer;
+    RemotePlayer.name = opponentName;
+    RemotePlayer.playerNumber = opponentNumber;
+
+    GameState.create(null);
+    Board.create(HumanPlayer, AIPlayer);
+
+	stage.update();
+}
+
+function startAiGame() {
+    $("#lobby").hide();
+    $("#game").show();
+
+    stage = new createjs.Stage("demoCanvas");
+
+    window.onresize = configureWindow;
+    configureWindow();
+
+    HumanPlayer.name = $("#me")[0].content;
+    HumanPlayer.opponent = AIPlayer;
+    HumanPlayer.playerNumber = 1;
     AIPlayer.opponent = HumanPlayer;
     AIPlayer.playerNumber = 2;
 
     GameState.create(null);
     Board.create(HumanPlayer, AIPlayer);
 
-	stage.update();
+    stage.update();
+}
+
+function init (name) {
+    HumanPlayer.name = $("#me").content;
 }
