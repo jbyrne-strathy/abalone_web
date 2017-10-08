@@ -1,6 +1,6 @@
 var AIPlayer = {
     playerNumber: 0,
-    name: "Monkey",
+    name: "",
     opponent: null,
     gameState: null,
     makeMove: function (moves) {
