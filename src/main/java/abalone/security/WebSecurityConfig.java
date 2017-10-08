@@ -6,10 +6,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
-
-import static abalone.security.AbalonePasswordEncoder.PASSWORD_ENCODER;
 
 @Configuration
 @EnableWebSecurity
@@ -34,10 +33,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication().dataSource(dataSource)
-                .passwordEncoder(PASSWORD_ENCODER)
+                .passwordEncoder(passwordEncoder)
                 .usersByUsernameQuery("SELECT username, password, enabled FROM player WHERE username=?")
                 .authoritiesByUsernameQuery("SELECT username, role FROM player WHERE username=?");
     }

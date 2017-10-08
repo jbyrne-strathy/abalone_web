@@ -1,4 +1,4 @@
-package abalone.database.table;
+package abalone.database.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,16 +11,13 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-import static abalone.security.AbalonePasswordEncoder.PASSWORD_ENCODER;
-
 @Entity
 @NoArgsConstructor
 public class Player {
-
     public Player(String username, String password) {
         this.id = UUID.randomUUID().toString();
         this.username = username;
-        this.password = PASSWORD_ENCODER.encode(password);
+        this.password = password;
         this.enabled = true;
         this.role = "ROLE_USER";
     }
