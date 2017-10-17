@@ -15,11 +15,15 @@ function configureWindow () {
 function startGame (myNumber, opponentNumber, opponentName, aiPlayer) {
     $("#lobby").hide();
     $("#game").show();
-    stage = new createjs.Stage("demoCanvas");
+    if (stage) {
+	    stage.removeAllChildren();
+    } else {
+        stage = new createjs.Stage("demoCanvas");
+    }
 	window.onresize = configureWindow;
 	configureWindow();
 
-    opponent = aiPlayer || RemotePlayer;
+    var opponent = aiPlayer || RemotePlayer;
     opponent.opponent = HumanPlayer;
     opponent.name = opponentName;
     opponent.playerNumber = opponentNumber;
@@ -30,12 +34,19 @@ function startGame (myNumber, opponentNumber, opponentName, aiPlayer) {
 
     GameState.create(null);
     Board.create(HumanPlayer, opponent);
-
+    MouseListener.finished = false;
 	stage.update();
 }
 
 function startAiGame() {
     startGame(1, 2, "Computer", AIPlayer);
+}
+
+function endGame() {
+    MouseListener.finished = true;
+    alert("Game over. Player " + GameState.winner + " has won!");
+    $("#game").hide();
+    $("#lobby").show();
 }
 
 function init (name) {

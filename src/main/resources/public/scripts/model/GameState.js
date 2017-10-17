@@ -12,7 +12,7 @@ var GameState = {
             GameState.player1Score = loadedState.player1Score;
             GameState.player2Score = loadedState.player2Score;
         } else {
-            GameState.spaces = Constants.defaultLayout;
+            GameState.spaces = $.extend({}, Constants.defaultLayout);
             GameState.winner = 0;
             GameState.currentPlayer = 1;
             GameState.player1Score = 0;

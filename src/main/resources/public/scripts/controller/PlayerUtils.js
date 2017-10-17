@@ -81,15 +81,22 @@ var PlayerUtils = {
         } );
         console.log(GameState.spaces);
 
-        if(GameState.currentPlayer == 1){
+        if (GameState.currentPlayer == 1) {
             GameState.currentPlayer = 2;
-        } else if(GameState.currentPlayer == 2){
+        } else if (GameState.currentPlayer == 2) {
             GameState.currentPlayer = 1;
         }
-        if(GameState.player1Score == 6){
+        if (GameState.player1Score == 6) {
             GameState.winner = 1;
-        } else if(GameState.player2Score == 6){
+        } else if (GameState.player2Score == 6) {
             GameState.winner = 2;
+        }
+    },
+    isGameOver: function () {
+        if (GameState.winner != 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 };

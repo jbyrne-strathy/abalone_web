@@ -6,7 +6,7 @@ var Board = {
 	player2Score: null,
 	player2Name: null,
 
-	create: function(player1, player2){
+	create: function (player1, player2) {
 	    if (!player1 || !player2) {
 	        player1 = HumanPlayer;
 	        player2 = AIPlayer;
