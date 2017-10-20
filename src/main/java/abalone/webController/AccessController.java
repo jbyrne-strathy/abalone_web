@@ -31,7 +31,6 @@ public class AccessController {
             return "redirect:/createAccount?error";
         }
         Player newPlayer = new Player( playerBean.getUsername(), passwordEncoder.encode( playerBean.getPassword() ) );
-        System.out.println(newPlayer.getId());
         System.out.println(newPlayer.getUsername());
         System.out.println(newPlayer.getPassword());
         System.out.println(newPlayer.getEnabled());

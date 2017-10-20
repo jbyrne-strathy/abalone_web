@@ -1,6 +1,11 @@
 package abalone.webController;
 
+import abalone.database.entity.Player;
+import abalone.database.repository.PlayerRepository;
+import abalone.dto.PlayerDto;
+import abalone.game.Lobby;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,13 +20,22 @@ public class GameController {
     /*private Facebook facebook;
     private ConnectionRepository connectionRepository;*/
 
+    @Autowired
+    private Lobby lobby;
+
+    @Autowired
+    private PlayerRepository playerRepository;
+
     @GetMapping(value = "/game")
     public String game(Model model) {
 //        if ( isFacebookNotConnected() ) {
 //            return "redirect:/connect/facebook";
 //        }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("user", auth.getName());
+        Player currentPlayer = playerRepository.findOne(auth.getName());
+        PlayerDto playerDto = new PlayerDto(currentPlayer.getUsername());
+        lobby.addPlayer(playerDto);
+        model.addAttribute("lobby", lobby.getLobby());
         return "/play/game";
     }
 

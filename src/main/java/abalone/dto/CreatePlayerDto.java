@@ -1,10 +1,8 @@
 package abalone.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-public class CreatePlayerDto {
-    private @Getter @Setter String username;
-
-    private @Getter @Setter String password;
+public @Data class CreatePlayerDto {
+    private String username;
+    private String password;
 }

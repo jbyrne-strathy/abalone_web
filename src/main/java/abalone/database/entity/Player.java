@@ -5,28 +5,21 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
 public class Player {
     public Player(String username, String password) {
-        this.id = UUID.randomUUID().toString();
         this.username = username;
         this.password = password;
         this.enabled = true;
         this.role = "ROLE_USER";
     }
 
-    @Id @NonNull
-    private @Getter @Setter String id;
-
-    @Column(unique = true)
-    @NotNull @NonNull
+    @Id @NotNull @NonNull
     private @Getter @Setter String username;
 
     @NotNull @NonNull

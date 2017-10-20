@@ -72,8 +72,7 @@
 				<input type="submit" value="Sign Out"/>
 			</form>
 			<ul>
-				<li th:each="player : ${players}" onclick=""><!-- TODO onclick: send invite to selected player. -->
-					<img th:src="${player.photo}"/>
+				<li th:each="player : ${lobby}" onclick=""><!-- TODO onclick: send invite to selected player. -->
 					<span th:text="${player.name}"/>
 				</li>
 			</ul>
