@@ -35,7 +35,7 @@ public class GameController {
         Player currentPlayer = playerRepository.findOne(auth.getName());
         PlayerDto playerDto = new PlayerDto(currentPlayer.getUsername());
         lobby.addPlayer(playerDto);
-        model.addAttribute("lobby", lobby.getLobby());
+        model.addAttribute("user", playerDto.getName());
         return "/play/game";
     }
 

@@ -49,6 +49,21 @@ function endGame() {
     $("#lobby").show();
 }
 
+function updateLobby(lobby) {
+    $.each(lobby, function (i, player) {
+        if (player.name != HumanPlayer.name) {
+            var row = "<tr><td>" + player.name + "</td></tr>";
+            $("#waitingPlayers").append(row);
+        }
+    });
+    Requests.getLobbyUpdate(updateLobby, handleError); /*Ready to test!*/
+}
+
+function handleError(error) {
+    console.error(error);
+}
+
 function init (name) {
-    HumanPlayer.name = $("#me").content;
+    HumanPlayer.name = $("#me")[0].content;
+    Requests.getLobby(updateLobby, handleError);
 }

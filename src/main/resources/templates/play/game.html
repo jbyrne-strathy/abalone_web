@@ -52,10 +52,9 @@
 		<script src="/scripts/controller/RemotePlayer.js"></script>
 		<script src="/scripts/controller/AIPlayer.js"></script>
 		<script src="/scripts/Constants.js"></script>
+		<script src="/scripts/Requests.js"></script>
 		<script src="/scripts/Main.js"></script>
 		<meta id="me" th:content="${user}"/>
-		<!--<meta id="player1" th:content="${player1}}"/>
-		<meta id="player2" th:content="${player2}}"/>-->
 	</head>
 	<body style="margin-top: 0; margin-bottom: 0" onload="init();">
 		<!--[if lt IE 8]>
@@ -71,11 +70,15 @@
 			<form th:action="@{/logout}" method="post">
 				<input type="submit" value="Sign Out"/>
 			</form>
-			<ul>
-				<li th:each="player : ${lobby}" onclick=""><!-- TODO onclick: send invite to selected player. -->
-					<span th:text="${player.name}"/>
-				</li>
-			</ul>
+			<table id="waitingPlayers">
+				<thead>
+					<tr>
+						<th>Name</th>
+					</tr>
+				</thead>
+				<tbody onclick=""><!-- TODO onclick: send invite to selected player. -->
+				</tbody>
+			</table>
 		</div>
 
 		<div id="game" style="display:none;">
