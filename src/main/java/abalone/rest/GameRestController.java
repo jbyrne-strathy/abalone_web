@@ -25,7 +25,7 @@ public class GameRestController {
 
     @GetMapping("/getLobbyUpdates")
     public DeferredResult<Iterable<PlayerDto>> getLobbyUpdates() {
-        DeferredResult<Iterable<PlayerDto>> result = new DeferredResult<>();
+        DeferredResult<Iterable<PlayerDto>> result = new DeferredResult<>(Long.MAX_VALUE);
         lobby.addObserver((lobby, lobbyUpdate) -> {result.setResult((Iterable<PlayerDto>)lobbyUpdate);});
         return result;
     }

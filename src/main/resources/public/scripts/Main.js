@@ -50,6 +50,7 @@ function endGame() {
 }
 
 function updateLobby(lobby) {
+    $("#waitingPlayers tbody")[0].remove("tr");
     $.each(lobby, function (i, player) {
         if (player.name != HumanPlayer.name) {
             var row = "<tr><td>" + player.name + "</td></tr>";
