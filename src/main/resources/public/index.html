@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<meta http-equiv="x-ua-compatible" content="ie=edge"/>
+	<title>Abalone</title>
+	<meta name="description" content=""/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<link rel="stylesheet" href="/css/normalize.css"/>
+	<link rel="stylesheet" href="/css/main.css"/>
+	<!--<script>
+        window.fbAsyncInit = function() {
+            FB.init({
+              appId            : 'your-app-id',
+              autoLogAppEvents : true,
+              xfbml            : true,
+              version          : 'v2.9'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "./fb-en_gb.js";
+         fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>-->
+
+	<!-- For the public server. -->
+	<!--<script src="../scripts/libraries.js"></script>-->
+	<!--<script src="../scripts/abalone.js"></script>-->
+	<!--<script src="../scripts/controllers.js"></script>-->
+	<!--<script src="../scripts/model.js"></script>-->
+
+	<!-- For development. -->
+	<script src="/scripts/libraries/modernizr-2.8.3.min.js"></script>
+	<script src="/scripts/libraries/plugins.js"></script>
+	<script src="/scripts/libraries/jquery-3.2.1.min.js"></script>
+	<script src="/scripts/libraries/easeljs-0.8.2.min.js"></script>
+	<script src="/scripts/model/Board.js"></script>
+	<script src="/scripts/model/Space.js"></script>
+	<script src="/scripts/model/Marble.js"></script>
+	<script src="/scripts/model/SelectedMarbles.js"></script>
+	<script src="/scripts/model/PushedMarbles.js"></script>
+	<script src="/scripts/model/Lines.js"></script>
+	<script src="/scripts/model/GameState.js"></script>
+	<script src="/scripts/controller/MouseListener.js"></script>
+	<script src="/scripts/controller/PlayerUtils.js"></script>
+	<script src="/scripts/controller/HumanPlayer.js"></script>
+	<script src="/scripts/controller/RemotePlayer.js"></script>
+	<script src="/scripts/controller/AIPlayer.js"></script>
+	<script src="/scripts/Constants.js"></script>
+	<script src="/scripts/Requests.js"></script>
+	<script src="/scripts/Main.js"></script>
+</head>
+<body style="margin-top: 0; margin-bottom: 0" onload="init();">
+<!--[if lt IE 8]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+<div id="login">
+	<div id="loginError">
+		Invalid name and password.
+	</div>
+	<div><label> User Name : <input type="text" id="username"/> </label></div>
+	<div><label> Password: <input type="password" id="password"/> </label></div>
+	<div><button onclick="login()">Sign In</button></div>
+	<div><button action="goToCreateAccount()">Create Account</button></div>
+</div>
+<div id="createAccount">
+	<div id="invalidUsername">
+		Username already exists.
+	</div>
+	<div><label> User Name : <input type="text" id="createUsername"/> </label></div>
+	<div><label> Password: <input type="password" id="createPassword"/> </label></div>
+	<div><button onclick="createAccount()">Create Account</button></div>
+	<div><button action="goToLogin()">Go to login</button></div>
+</div>
+<div id="lobby">
+	<p>Welcome, user></span></p>
+	<p><button onclick="goToLeaderboard()">Go to Leaderboard</button></p>
+	<!--<form action="/">&lt;!&ndash; TODO Rest request to get and invite friends to play. Only available for facebook users. &ndash;&gt;
+        <button type="submit">Invite friends</button>
+    </form>-->
+	<p><button onclick="startAiGame()">Start an AI Game</button></p>
+	<table id="waitingPlayers">
+		<thead>
+		<tr>
+			<th>Name</th>
+		</tr>
+		</thead>
+		<tbody onclick=""><!-- TODO onclick: send invite to selected player. -->
+		</tbody>
+	</table>
+</div>
+<div id="leaderboard">
+	<p><button onclick="goToLobby()">Go to Lobby</button></p>
+	<table id="leagueTable">
+		<thead>
+		<tr>
+			<th>Position</th><th>Name</th><th>Wins</th><th>Losses</th><th>Marbles Scored</th><th>Marbles Lost</th><th>Points</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>1</td><td>James</td><td>100</td><td>0</td><td>600</td><td>0</td><td>10000</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<div id="game" style="display:none;">
+	<canvas id="demoCanvas" style="display:block; margin:auto"></canvas>
+</div>
+</body>
+</html>

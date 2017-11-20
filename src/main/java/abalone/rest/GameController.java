@@ -13,8 +13,7 @@ import org.springframework.web.context.request.async.DeferredResult;
  */
 @RestController
 @RequestMapping("/rest")
-public class GameRestController {
-
+public class GameController {
     @Autowired
     private Lobby lobby;
 
@@ -26,7 +25,12 @@ public class GameRestController {
     @GetMapping("/getLobbyUpdates")
     public DeferredResult<Iterable<PlayerDto>> getLobbyUpdates() {
         DeferredResult<Iterable<PlayerDto>> result = new DeferredResult<>(Long.MAX_VALUE);
-        lobby.addObserver((lobby, lobbyUpdate) -> {result.setResult((Iterable<PlayerDto>)lobbyUpdate);});
+        lobby.addObserver((lobby, lobbyUpdate) -> result.setResult( (Iterable<PlayerDto>)lobbyUpdate ));
         return result;
     }
+
+//    @GetMapping("/getLeaderboard")
+//    public DeferredResult<Iterable<PlayerDto>> getLeaderboard() {
+//        TODO
+//    }
 }

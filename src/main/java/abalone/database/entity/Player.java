@@ -15,8 +15,6 @@ public class Player {
     public Player(String username, String password) {
         this.username = username;
         this.password = password;
-        this.enabled = true;
-        this.role = "ROLE_USER";
     }
 
     @Id @NotNull @NonNull
@@ -24,10 +22,4 @@ public class Player {
 
     @NotNull @NonNull
     private @Getter @Setter String password;
-
-    @NotNull @NonNull
-    private @Getter @Setter Boolean enabled;
-
-    @NotNull @NonNull
-    private @Getter @Setter String role;
 }

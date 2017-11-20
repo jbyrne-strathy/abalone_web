@@ -1,3 +1,4 @@
+/*##### GAME FUNCTIONS #####*/
 var stage, isoScale;
 function configureWindow () {
 	var w = window.innerWidth
@@ -13,7 +14,7 @@ function configureWindow () {
 }
 
 function startGame (myNumber, opponentNumber, opponentName, aiPlayer) {
-    $("#lobby").hide();
+    hideAllDivs();
     $("#game").show();
     if (stage) {
 	    stage.removeAllChildren();
@@ -45,26 +46,89 @@ function startAiGame() {
 function endGame() {
     MouseListener.finished = true;
     alert("Game over. Player " + GameState.winner + " has won!");
-    $("#game").hide();
+    goToLobby();
+}
+
+/*##### LOGIN FUNCTIONS #####*/
+
+function goToLogin () {
+    hideAllDivs();
+    $("#login").show();
+}
+
+function goToCreateAccount () {
+    hideAllDivs();
+    $("#createAccount").show();
+}
+
+function storeLoginToken (token) {
+    sessionStorage.token = token;
+    goToLobby();
+}
+
+function login () {
+    Requests.login($("#username").val(), $("#password").val(), storeLoginToken, handleError);
+}
+
+function createAccount () {
+    Requests.createAccount($("#createUsername").val(), $("#createPassword").val(), goToLogin, handleError);
+}
+
+/*##### LEADERBOARD FUNCTIONS #####*/
+
+function goToLeaderboard () {
+    hideAllDivs();
+    Requests.getLeaderboard(updateLeaderboard, handleError);
+    $("#leaderboard").show();
+}
+
+function updateLeaderboard (leaderboard) {
+    if($("leaderboard").is(":visible")) {
+        $("#leagueTable tbody")[0].remove("tr");
+        $.each(leaderboard, function (i, player) {
+            var row = "<tr><td>" + (i+1) + "</td><td>" + player.name + "</td><td>" + player.wins + "</td><td>" + player.losses + "</td><td>" + player.pointsFor + "</td><td>" + player.pointsAgainst + "</td></tr>";
+            $("#leagueTable").append(row);
+        });
+        Requests.getLeaderboardUpdate(updateLeaderboard, handleError);
+    }
+}
+
+/*##### LOBBY FUNCTIONS #####*/
+
+function goToLobby () {
+    hideAllDivs();
+    Requests.getLobby(updateLobby, handleError);
     $("#lobby").show();
 }
 
 function updateLobby(lobby) {
-    $("#waitingPlayers tbody")[0].remove("tr");
-    $.each(lobby, function (i, player) {
-        if (player.name != HumanPlayer.name) {
-            var row = "<tr><td>" + player.name + "</td></tr>";
-            $("#waitingPlayers").append(row);
-        }
-    });
-    Requests.getLobbyUpdate(updateLobby, handleError); /*Ready to test!*/
+    if ($("lobby").is(":visible")) {
+        $("#waitingPlayers tbody")[0].remove("tr");
+        $.each(lobby, function (i, player) {
+            if (player.name != HumanPlayer.name) {
+                var row = "<tr><td>" + player.name + "</td></tr>";
+                $("#waitingPlayers").append(row);
+            }
+        });
+        Requests.getLobbyUpdate(updateLobby, handleError); /*Ready to test!*/
+    }
+}
+
+/*##### GENERAL FUNCTIONS #####*/
+
+function hideAllDivs () {
+    $("#lobby").hide();
+    $("#leaderboard").hide();
+    $("#game").hide();
+    $("#login").hide();
+    $("#createAccount").hide();
 }
 
 function handleError(error) {
-    console.error(error);
+    // TODO Something better
+    alert(error.toString());
 }
 
 function init (name) {
-    HumanPlayer.name = $("#me")[0].content;
-    Requests.getLobby(updateLobby, handleError);
+    goToLogin();
 }
