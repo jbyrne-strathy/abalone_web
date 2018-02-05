@@ -63,15 +63,26 @@ function goToCreateAccount () {
 
 function storeLoginToken (token) {
     sessionStorage.token = token;
+    sessionStorage.name = $("#username").val();
     goToLobby();
 }
 
 function login () {
-    Requests.login($("#username").val(), $("#password").val(), storeLoginToken, handleError);
+    Requests.login($("#username").val(), $("#password").val(), storeLoginToken, handleLoginError);
+}
+
+function handleLoginError(error) {
+    console.log("handleLoginError", JSON.stringify(error));
+    $("#loginError").show();
 }
 
 function createAccount () {
-    Requests.createAccount($("#createUsername").val(), $("#createPassword").val(), goToLogin, handleError);
+    Requests.createAccount($("#createUsername").val(), $("#createPassword").val(), goToLogin, handleCreateAccountError);
+}
+
+function handleCreateAccountError(error) {
+    console.log("handleCreateAccountError", JSON.stringify(error));
+    $("#invalidUsername").show();
 }
 
 /*##### LEADERBOARD FUNCTIONS #####*/
@@ -97,13 +108,15 @@ function updateLeaderboard (leaderboard) {
 
 function goToLobby () {
     hideAllDivs();
-    Requests.getLobby(updateLobby, handleError);
+    Requests.joinLobby(updateLobby, handleError);
+    HumanPlayer.name = sessionStorage.name;
+    $("#myName").text(HumanPlayer.name);
     $("#lobby").show();
 }
 
 function updateLobby(lobby) {
-    if ($("lobby").is(":visible")) {
-        $("#waitingPlayers tbody")[0].remove("tr");
+    if ($("#lobby").is(":visible")) {
+        $("#waitingPlayers tbody tr").remove();
         $.each(lobby, function (i, player) {
             if (player.name != HumanPlayer.name) {
                 var row = "<tr><td>" + player.name + "</td></tr>";
@@ -124,11 +137,20 @@ function hideAllDivs () {
     $("#createAccount").hide();
 }
 
-function handleError(error) {
+function handleError (error) {
     // TODO Something better
-    alert(error.toString());
+    console.log("handleError", JSON.stringify(error));
+    goToLogin();
 }
 
 function init (name) {
-    goToLogin();
+    if(sessionStorage.token) {
+        goToLobby();
+    } else {
+        goToLogin();
+    }
+    window.addEventListener("beforeunload", function (e) {
+        Requests.leaveLobby();
+        return null;
+    });
 }

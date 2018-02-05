@@ -15,7 +15,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static abalone.security.SecurityConstants.*;
+import static abalone.security.SecurityConstants.BASE_URL;
+import static abalone.security.SecurityConstants.CSS_URL;
+import static abalone.security.SecurityConstants.SCRIPTS_URL;
+import static abalone.security.SecurityConstants.SIGN_UP_URL;
 
 @Configuration
 @EnableWebSecurity

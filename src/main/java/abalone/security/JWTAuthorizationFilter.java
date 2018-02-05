@@ -13,11 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static abalone.security.SecurityConstants.*;
+import static abalone.security.SecurityConstants.HEADER_STRING;
+import static abalone.security.SecurityConstants.SECRET;
+import static abalone.security.SecurityConstants.TOKEN_PREFIX;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JWTAuthorizationFilter(AuthenticationManager authManager) {
+    JWTAuthorizationFilter(AuthenticationManager authManager) {
         super(authManager);
     }
 

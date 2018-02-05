@@ -60,25 +60,25 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 <div id="login">
-	<div id="loginError">
+	<div hidden id="loginError">
 		Invalid name and password.
 	</div>
 	<div><label> User Name : <input type="text" id="username"/> </label></div>
 	<div><label> Password: <input type="password" id="password"/> </label></div>
 	<div><button onclick="login()">Sign In</button></div>
-	<div><button action="goToCreateAccount()">Create Account</button></div>
+	<div><button onclick="goToCreateAccount()">Go to Create Account</button></div>
 </div>
 <div id="createAccount">
-	<div id="invalidUsername">
+	<div hidden id="invalidUsername">
 		Username already exists.
 	</div>
-	<div><label> User Name : <input type="text" id="createUsername"/> </label></div>
-	<div><label> Password: <input type="password" id="createPassword"/> </label></div>
+	<div><label> New User Name : <input type="text" id="createUsername"/> </label></div>
+	<div><label> New Password: <input type="password" id="createPassword"/> </label></div>
 	<div><button onclick="createAccount()">Create Account</button></div>
-	<div><button action="goToLogin()">Go to login</button></div>
+	<div><button onclick="goToLogin()">Go to login</button></div>
 </div>
 <div id="lobby">
-	<p>Welcome, user></span></p>
+	<p>Welcome, <span id="myName">user</span></p>
 	<p><button onclick="goToLeaderboard()">Go to Leaderboard</button></p>
 	<!--<form action="/">&lt;!&ndash; TODO Rest request to get and invite friends to play. Only available for facebook users. &ndash;&gt;
         <button type="submit">Invite friends</button>
