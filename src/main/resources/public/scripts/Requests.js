@@ -1,25 +1,25 @@
 var Requests = {
     joinLobby: function (successHandler, errorHandler) {
         $.get({
-            url: "/rest/joinLobby",
+            url: "/lobby/joinLobby",
             headers: {Authorization: "Bearer " + sessionStorage.token}
         }).then(successHandler, errorHandler);
     },
     getLobbyUpdate: function (successHandler, errorHandler) {
         $.get({
-            url: "/rest/getLobbyUpdates",
+            url: "/lobby/getLobbyUpdates",
             headers: {Authorization: "Bearer " + sessionStorage.token}
         }).then(successHandler, errorHandler);
     },
     getLeaderboard: function (successHandler, errorHandler) {
         $.get({
-            url: "/rest/getLeaderboard",
+            url: "/lobby/getLeaderboard",
             headers: {Authorization: "Bearer " + sessionStorage.token}
         }).then(successHandler, errorHandler);
     },
     getLeaderboardUpdates: function (successHandler, errorHandler) {
         $.get({
-            url: "/rest/getLeaderboardUpdates",
+            url: "/lobby/getLeaderboardUpdates",
             headers: {Authorization: "Bearer " + sessionStorage.token}
         }).then(successHandler, errorHandler);
     },
@@ -33,10 +33,26 @@ var Requests = {
     },
     leaveLobby: function () {
         $.ajax({
-            method: "postxa",
-            url: "/rest/leaveLobby",
+            method: "post",
+            url: "/lobby/leaveLobby",
             headers: {Authorization: "Bearer " + sessionStorage.token},
             data: {}
         })
+    },
+    sendChallenge: function (target, successHandler, errorHandler) {
+        $.ajax({
+            method: "post",
+            url: "/lobby/sendChallenge",
+            headers: {Authorization: "Bearer " + sessionStorage.token},
+            data: {challengedPlayer: target}
+        }).then(successHandler, errorHandler);
+    },
+    answerChallenge: function (isAccepted, successHandler, errorHandler) {
+        $.ajax({
+            method: "post",
+            url: "/lobby/answerChallenge",
+            headers: {Authorization: "Bearer " + sessionStorage.token},
+            data: {isAccepted: isAccepted}
+        }).then(successHandler, errorHandler);
     }
 }

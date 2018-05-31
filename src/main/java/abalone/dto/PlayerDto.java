@@ -2,6 +2,7 @@ package abalone.dto;
 
 import lombok.Value;
 
-public @Value class PlayerDto {
+@Value
+public class PlayerDto {
     private String name;
 }

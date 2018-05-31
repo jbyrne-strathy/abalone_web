@@ -114,17 +114,72 @@ function goToLobby () {
     $("#lobby").show();
 }
 
-function updateLobby(lobby) {
+function goToChallenge (challenger) {
+    hideAllDivs();
+    $("#challenger").text(challenger);
+    $("#challengeReceived").show();
+}
+
+function goToWaiting (challenged) {
+    hideAllDivs();
+    $("#challenged").text(challenged);
+    $("#challengeSent").show();
+}
+
+function updateLobby (lobby) {
     if ($("#lobby").is(":visible")) {
         $("#waitingPlayers tbody tr").remove();
-        $.each(lobby, function (i, player) {
+
+        $.each(lobby.players, function (i, player) {
             if (player.name != HumanPlayer.name) {
-                var row = "<tr><td>" + player.name + "</td></tr>";
+                var row = $("<tr></tr>");
+                var td = $("<td>" + player.name + "</td>");
+                row.attr("onclick", "sendChallenge('" + player.name + "', handleChallengeResponse, handleError)");
+                row.append(td);
                 $("#waitingPlayers").append(row);
             }
         });
-        Requests.getLobbyUpdate(updateLobby, handleError); /*Ready to test!*/
+
+        if (lobby.challenges != null) {
+            $.each(lobby.challenges, function (i, challenge) {
+                if (challenge.challenged.name == HumanPlayer.name) {
+                    goToChallenge(challenge.challenger.name);
+                    return false;
+                } else if (challenge.challenger.name == HumanPlayer.name) {
+                    goToWaiting(challenge.challenged.name);
+                    return false;
+                }
+            });
+        }
+
+        Requests.getLobbyUpdate(updateLobby, handleError);
+    } else if ($("#challengeSent").is(":visible")
+            || $("#challengeReceived").is(":visible")) {
+        if (!lobby.challenges.find(function (challenge) {
+            return challenge.challenger.name == HumanPlayer.name
+                    || challenge.challenged.name == HumanPlayer.name
+        })) {
+            goToLobby();
+        }
     }
+}
+
+function handleChallengeResponse (response) {
+    // No action required.
+    console.log("Challenge response: ", response);
+}
+
+function sendChallenge (player) {
+    Requests.sendChallenge(player, handleChallengeResponse, handleError);
+}
+
+function acceptChallenge () {
+    //TODO start the game
+    Requests.answerChallenge(true, null, handleError);
+}
+
+function rejectChallenge () {
+    Requests.answerChallenge(false, goToLobby, handleError);
 }
 
 /*##### GENERAL FUNCTIONS #####*/
@@ -135,6 +190,8 @@ function hideAllDivs () {
     $("#game").hide();
     $("#login").hide();
     $("#createAccount").hide();
+    $("#challengeSent").hide();
+    $("#challengeReceived").hide();
 }
 
 function handleError (error) {

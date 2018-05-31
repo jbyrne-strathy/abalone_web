@@ -90,9 +90,17 @@
 			<th>Name</th>
 		</tr>
 		</thead>
-		<tbody onclick=""><!-- TODO onclick: send invite to selected player. -->
+		<tbody>
 		</tbody>
 	</table>
+</div>
+<div id="challengeSent">
+	<p>You have challenged <span id="challenged">A user</span> to a game. Waiting for a response.</p>
+</div>
+<div id="challengeReceived">
+	<p><span id="challenger">A user</span> has challenged you to a game.</p>
+	<p><button onclick="acceptChallenge()">Accept</button> </p>
+	<p><button onclick="rejectChallenge()">Reject</button> </p>
 </div>
 <div id="leaderboard">
 	<p><button onclick="goToLobby()">Go to Lobby</button></p>
