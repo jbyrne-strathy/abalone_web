@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Component
 public class Lobby extends Observable {
@@ -27,7 +27,6 @@ public class Lobby extends Observable {
         deleteObservers();
     }
 
-    @Synchronized
     public LobbyUpdateDto getLobby() {
         LobbyUpdateDto lobbyUpdateDto = new LobbyUpdateDto();
         lobbyUpdateDto.setPlayers(players);
@@ -43,13 +42,12 @@ public class Lobby extends Observable {
 
     public void addChallenge(ChallengeDto challenge) {
         if ( challenges.add(challenge) ) {
-            players.forEach(player -> {
-                if ( player.getName().equals(challenge.getChallenger().getName())
-                        || player.getName().equals(challenge.getChallenged().getName()) ) {
-                    players.remove(player);
-                }
-            });
-            sendUpdates();
+            Iterable<PlayerDto> challengePlayers = players.stream().filter(player ->
+                player.getName().equals(challenge.getChallenger().getName())
+                        || player.getName().equals(challenge.getChallenged().getName())
+            ).collect(Collectors.toList());
+
+            removePlayers(challengePlayers);
         }
     }
 
@@ -69,16 +67,11 @@ public class Lobby extends Observable {
         sendUpdates();
     }
 
-    public void removePlayers(Iterable<PlayerDto> players) {
-        AtomicBoolean isUpdated = new AtomicBoolean(false);
-        players.forEach(playerDto -> {
-            if ( this.players.remove(playerDto) ) {
-                isUpdated.set(true);
-            }
-        });
-        if (isUpdated.get()) {
-            sendUpdates();
+    public void removePlayers(Iterable<PlayerDto> playersToRemove) {
+        for (PlayerDto playerDto : playersToRemove) {
+            players.remove(playerDto);
         }
+        sendUpdates();
     }
 
     public PlayerDto getPlayer(String name) {

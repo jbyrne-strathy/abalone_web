@@ -35,6 +35,7 @@
 	<!--<script src="../scripts/model.js"></script>-->
 
 	<!-- For development. -->
+	<script src="/scripts/libraries/knockout-3.4.2.js"></script>
 	<script src="/scripts/libraries/modernizr-2.8.3.min.js"></script>
 	<script src="/scripts/libraries/plugins.js"></script>
 	<script src="/scripts/libraries/jquery-3.2.1.min.js"></script>
@@ -53,55 +54,68 @@
 	<script src="/scripts/controller/AIPlayer.js"></script>
 	<script src="/scripts/Constants.js"></script>
 	<script src="/scripts/Requests.js"></script>
-	<script src="/scripts/Main.js"></script>
 </head>
-<body style="margin-top: 0; margin-bottom: 0" onload="init();">
+<body style="margin-top: 0; margin-bottom: 0" data-bind="event: {load: init, beforeunload: leaveLobby}">
 <!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
+<!-- ko if: visibleSection() === Constants.sections.login -->
 <div id="login">
-	<div hidden id="loginError">
+	<div data-bind="if: loginError" id="loginError">
 		Invalid name and password.
 	</div>
-	<div><label> User Name : <input type="text" id="username"/> </label></div>
-	<div><label> Password: <input type="password" id="password"/> </label></div>
-	<div><button onclick="login()">Sign In</button></div>
-	<div><button onclick="goToCreateAccount()">Go to Create Account</button></div>
+	<div><label> User Name: <input type="text" data-bind="textInput: username"/> </label></div>
+	<div><label> Password: <input type="password" data-bind="textInput: password"/> </label></div>
+	<div><button data-bind="click: login">Sign In</button></div>
+	<div><button data-bind="click: goToCreateAccount">Go to Create Account</button></div>
 </div>
+<!-- /ko -->
+<!-- ko if: visibleSection() === Constants.sections.createAccount -->
 <div id="createAccount">
 	<div hidden id="invalidUsername">
 		Username already exists.
 	</div>
-	<div><label> New User Name : <input type="text" id="createUsername"/> </label></div>
-	<div><label> New Password: <input type="password" id="createPassword"/> </label></div>
-	<div><button onclick="createAccount()">Create Account</button></div>
-	<div><button onclick="goToLogin()">Go to login</button></div>
+	<div><label> New User Name : <input type="text" data-bind="text: username"/> </label></div>
+	<div><label> New Password: <input type="password" data-bind="text: password"/> </label></div>
+	<div><button data-bind="click: createAccount">Create Account</button></div>
+	<div><button data-bind="click: goToLogin">Go to login</button></div>
 </div>
+<!-- /ko -->
+<!-- ko if: visibleSection() === Constants.sections.lobby -->
 <div id="lobby">
-	<p>Welcome, <span id="myName">user</span></p>
-	<p><button onclick="goToLeaderboard()">Go to Leaderboard</button></p>
+	<p>Welcome, <span data-bind="text: HumanPlayer.name">user</span></p>
+	<p><button data-bind="click: goToLeaderboard">Go to Leaderboard</button></p>
 	<!--<form action="/">&lt;!&ndash; TODO Rest request to get and invite friends to play. Only available for facebook users. &ndash;&gt;
         <button type="submit">Invite friends</button>
     </form>-->
-	<p><button onclick="startAiGame()">Start an AI Game</button></p>
+	<!--<p><button data-bind="click: startAiGame">Start an AI Game</button></p>-->
 	<table id="waitingPlayers">
 		<thead>
 		<tr>
 			<th>Name</th>
 		</tr>
 		</thead>
-		<tbody>
+		<tbody data-bind="foreach: lobby">
+		<tr data-bind="click: $root.sendChallenge">
+			<td data-bind="text: name"></td>
+		</tr>
 		</tbody>
 	</table>
 </div>
+<!-- /ko -->
+<!-- ko if: visibleSection() === Constants.sections.challengeSent -->
 <div id="challengeSent">
-	<p>You have challenged <span id="challenged">A user</span> to a game. Waiting for a response.</p>
+	<p>You have challenged <span data-bind="text: challenged">A user</span> to a game. Waiting for a response.</p>
 </div>
+<!-- /ko -->
+<!-- ko if: visibleSection() === Constants.sections.challengeReceived -->
 <div id="challengeReceived">
-	<p><span id="challenger">A user</span> has challenged you to a game.</p>
-	<p><button onclick="acceptChallenge()">Accept</button> </p>
-	<p><button onclick="rejectChallenge()">Reject</button> </p>
+	<p><span data-bind="text: challenger">A user</span> has challenged you to a game.</p>
+	<p><button data-bind="click: acceptChallenge">Accept</button> </p>
+	<p><button data-bind="click: rejectChallenge">Reject</button> </p>
 </div>
+<!-- /ko -->
+<!-- ko if: visibleSection() === Constants.sections.leaderboard -->
 <div id="leaderboard">
 	<p><button onclick="goToLobby()">Go to Lobby</button></p>
 	<table id="leagueTable">
@@ -117,8 +131,12 @@
 		</tbody>
 	</table>
 </div>
+<!-- /ko -->
+<!-- ko if: visibleSection() === Constants.sections.game -->
 <div id="game" style="display:none;">
 	<canvas id="demoCanvas" style="display:block; margin:auto"></canvas>
 </div>
+<!-- /ko -->
 </body>
+<script src="/scripts/AbaloneViewModel.js"></script>
 </html>
