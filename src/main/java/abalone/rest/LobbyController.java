@@ -67,7 +67,6 @@ public class LobbyController {
     @PostMapping("/answerChallenge")
     public void answerChallenge(Boolean isAccepted) {
         ChallengeDto challenge = lobby.getChallenge(getCurrentPlayerName());
-        challenge.setIsAccepted(isAccepted);
         if (isAccepted) {
             // TODO Create new game with both players
         } else {
