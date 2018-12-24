@@ -7,18 +7,18 @@ import lombok.Synchronized;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Component
-public class Lobby extends Observable {
+public class LobbyManager extends Observable {
     private Set<PlayerDto> players = Collections.synchronizedSet(new HashSet<>());
-    private Map<String, ChallengeDto> challenges = Collections.synchronizedMap(new HashMap<>());
+    private SortedMap<String, ChallengeDto> challenges = Collections.synchronizedSortedMap(new TreeMap<>());
 
     @Synchronized
     private void sendUpdates() {
@@ -55,11 +55,20 @@ public class Lobby extends Observable {
         return challenges.get(challenged);
     }
 
+    public void updateChallenge (ChallengeDto challenge){
+        challenges.put(challenge.getChallenged().getName(), challenge);
+        sendUpdates();
+    }
+
+    public void removeChallenge (String challenged) {
+        challenges.remove(challenged);
+        sendUpdates();
+    }
+
     public void returnPlayersToLobby(ChallengeDto challenge) {
-        challenges.remove(challenge.getChallenged().getName());
         players.add(challenge.getChallenger());
         players.add(challenge.getChallenged());
-        sendUpdates();
+        removeChallenge(challenge.getChallenged().getName());
     }
 
     public void removePlayers(Iterable<PlayerDto> playersToRemove) {

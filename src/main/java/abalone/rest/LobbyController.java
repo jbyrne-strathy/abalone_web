@@ -3,7 +3,8 @@ package abalone.rest;
 import abalone.dto.ChallengeDto;
 import abalone.dto.LobbyUpdateDto;
 import abalone.dto.PlayerDto;
-import abalone.game.Lobby;
+import abalone.game.GameManager;
+import abalone.game.LobbyManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.UUID;
 
 /**
  * Created by james on 20/06/17.
@@ -22,7 +24,10 @@ import java.util.LinkedList;
 @RequestMapping("/lobby")
 public class LobbyController {
     @Autowired
-    private Lobby lobby;
+    private LobbyManager lobbyManager;
+
+    @Autowired
+    private GameManager gameManager;
 
     private String getCurrentPlayerName() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
@@ -30,14 +35,14 @@ public class LobbyController {
 
     @GetMapping("/joinLobby")
     public LobbyUpdateDto joinLobby() {
-        lobby.addPlayer( new PlayerDto(SecurityContextHolder.getContext().getAuthentication().getName()) );
-        return lobby.getLobby();
+        lobbyManager.addPlayer( new PlayerDto(SecurityContextHolder.getContext().getAuthentication().getName()) );
+        return lobbyManager.getLobby();
     }
 
     @GetMapping("/getLobbyUpdates")
     public DeferredResult<LobbyUpdateDto> getLobbyUpdates() {
         DeferredResult<LobbyUpdateDto> result = new DeferredResult<>(Long.MAX_VALUE);
-        lobby.addObserver( (lobby, lobbyUpdate) -> result.setResult((LobbyUpdateDto)lobbyUpdate) );
+        lobbyManager.addObserver( (lobby, lobbyUpdate) -> result.setResult((LobbyUpdateDto)lobbyUpdate) );
         return result;
     }
 
@@ -53,24 +58,32 @@ public class LobbyController {
     public void leaveLobby() {
         Collection<PlayerDto> toDelete = new LinkedList<>();
         toDelete.add(new PlayerDto(getCurrentPlayerName()));
-        lobby.removePlayers(toDelete);
+        lobbyManager.removePlayers(toDelete);
     }
 
     @PostMapping("/sendChallenge")
     public void sendChallenge(String challengedPlayer) {
         ChallengeDto challenge = new ChallengeDto();
-        challenge.setChallenged(lobby.getPlayer(challengedPlayer));
-        challenge.setChallenger(lobby.getPlayer(getCurrentPlayerName()));
-        lobby.addChallenge(challenge);
+        challenge.setChallenged(lobbyManager.getPlayer(challengedPlayer));
+        challenge.setChallenger(lobbyManager.getPlayer(getCurrentPlayerName()));
+        lobbyManager.addChallenge(challenge);
     }
 
     @PostMapping("/answerChallenge")
-    public void answerChallenge(Boolean isAccepted) {
-        ChallengeDto challenge = lobby.getChallenge(getCurrentPlayerName());
+    public UUID answerChallenge(Boolean isAccepted) {
+        ChallengeDto challenge = lobbyManager.getChallenge(getCurrentPlayerName());
         if (isAccepted) {
-            // TODO Create new game with both players
+            UUID gameId = gameManager.createGame(challenge);
+            if (gameId != null) {
+                challenge.setGameID(gameId);
+                lobbyManager.updateChallenge(challenge);
+            } else {
+                lobbyManager.returnPlayersToLobby(challenge);
+            }
+            return gameId;
         } else {
-            lobby.returnPlayersToLobby(challenge);
+            lobbyManager.returnPlayersToLobby(challenge);
+            return null;
         }
     }
 }

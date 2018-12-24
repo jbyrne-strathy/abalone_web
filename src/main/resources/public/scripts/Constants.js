@@ -1,4 +1,4 @@
-var Constants = {
+const Constants = {
 	boardWidth: 1000,
 	boardHeight: 870,
 	halfBoardSpacing: 50,

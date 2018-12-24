@@ -10,7 +10,7 @@ var AIPlayer = {
     },
     update: function (moves, gameStateHash) {
         MouseListener.currentPlayer = AIPlayer.playerNumber;
-        MouseListener.isHuman = false;
+        MouseListener.isMyTurn = false;
         var moves = AIPlayer.findAvailableMoves();
         var index = Math.floor( Math.random() * moves.length );
         var move = moves[index];

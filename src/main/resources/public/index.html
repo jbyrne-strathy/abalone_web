@@ -40,14 +40,8 @@
 	<script src="/scripts/libraries/plugins.js"></script>
 	<script src="/scripts/libraries/jquery-3.2.1.min.js"></script>
 	<script src="/scripts/libraries/easeljs-0.8.2.min.js"></script>
-	<script src="/scripts/model/Board.js"></script>
 	<script src="/scripts/model/Space.js"></script>
 	<script src="/scripts/model/Marble.js"></script>
-	<script src="/scripts/model/SelectedMarbles.js"></script>
-	<script src="/scripts/model/PushedMarbles.js"></script>
-	<script src="/scripts/model/Lines.js"></script>
-	<script src="/scripts/model/GameState.js"></script>
-	<script src="/scripts/controller/MouseListener.js"></script>
 	<script src="/scripts/controller/PlayerUtils.js"></script>
 	<script src="/scripts/controller/HumanPlayer.js"></script>
 	<script src="/scripts/controller/RemotePlayer.js"></script>
@@ -83,7 +77,7 @@
 <!-- /ko -->
 <!-- ko if: visibleSection() === Constants.sections.lobby -->
 <div id="lobby">
-	<p>Welcome, <span data-bind="text: HumanPlayer.name">user</span></p>
+	<p>Welcome, <span data-bind="text: username">user</span></p>
 	<p><button data-bind="click: goToLeaderboard">Go to Leaderboard</button></p>
 	<!--<form action="/">&lt;!&ndash; TODO Rest request to get and invite friends to play. Only available for facebook users. &ndash;&gt;
         <button type="submit">Invite friends</button>
@@ -133,7 +127,7 @@
 </div>
 <!-- /ko -->
 <!-- ko if: visibleSection() === Constants.sections.game -->
-<div id="game" style="display:none;">
+<div id="game">
 	<canvas id="demoCanvas" style="display:block; margin:auto"></canvas>
 </div>
 <!-- /ko -->

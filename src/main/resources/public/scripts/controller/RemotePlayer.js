@@ -12,7 +12,7 @@ var RemotePlayer = {
     },
     update: function(moves) {
         MouseListener.currentPlayer = RemotePlayer.playerNumber;
-        MouseListener.isHuman = false;
+        MouseListener.isMyTurn = false;
         // TODO Send opponent's moves to the server
         // $.post("game server url", moves, makeMove);
     }

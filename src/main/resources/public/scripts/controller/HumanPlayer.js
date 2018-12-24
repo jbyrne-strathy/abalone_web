@@ -11,8 +11,7 @@ var HumanPlayer = {
         }
     },
     update: function (moves, gameStateHash) {
-        MouseListener.currentPlayer = HumanPlayer.playerNumber;
-        MouseListener.isHuman = true;
+        MouseListener.isMyTurn = true;
         // TODO Validate GameState matches our GameState.
         if (PlayerUtils.isGameOver()) {
             window.endGame();

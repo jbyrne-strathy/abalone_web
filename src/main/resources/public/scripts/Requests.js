@@ -54,5 +54,11 @@ var Requests = {
             headers: {Authorization: "Bearer " + sessionStorage.token},
             data: {isAccepted: isAccepted}
         }).then(successHandler, errorHandler);
+    },
+    loadGame: function (gameId, successHandler, errorHandler) {
+        $.get({
+            url: "/game/loadGame?id=" + gameId,
+            headers: {Authorization: "Bearer " + sessionStorage.token}
+        }).then(successHandler, errorHandler);
     }
 }
