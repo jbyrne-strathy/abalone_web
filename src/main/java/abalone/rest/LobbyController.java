@@ -1,9 +1,7 @@
 package abalone.rest;
 
-import abalone.dto.ChallengeDto;
 import abalone.dto.LobbyUpdateDto;
 import abalone.dto.PlayerDto;
-import abalone.game.GameManager;
 import abalone.game.LobbyManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * Created by james on 20/06/17.
@@ -23,26 +22,33 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/lobby")
 public class LobbyController {
-    @Autowired
-    private LobbyManager lobbyManager;
+    private final LobbyManager lobbyManager;
 
     @Autowired
-    private GameManager gameManager;
+    public LobbyController(LobbyManager lobbyManager) {
+        this.lobbyManager = lobbyManager;
+    }
 
     private String getCurrentPlayerName() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     @GetMapping("/joinLobby")
-    public LobbyUpdateDto joinLobby() {
-        lobbyManager.addPlayer( new PlayerDto(SecurityContextHolder.getContext().getAuthentication().getName()) );
-        return lobbyManager.getLobby();
+    public DeferredResult<LobbyUpdateDto> joinLobby() {
+        DeferredResult<LobbyUpdateDto> result = new DeferredResult<>();
+
+        String myName = getCurrentPlayerName();
+        ForkJoinPool.commonPool().execute(() -> result.setResult(lobbyManager.addPlayer( new PlayerDto( myName ))));
+
+        return result;
     }
 
     @GetMapping("/getLobbyUpdates")
     public DeferredResult<LobbyUpdateDto> getLobbyUpdates() {
         DeferredResult<LobbyUpdateDto> result = new DeferredResult<>(Long.MAX_VALUE);
-        lobbyManager.addObserver( (lobby, lobbyUpdate) -> result.setResult((LobbyUpdateDto)lobbyUpdate) );
+
+        lobbyManager.addObserver( (lobby, lobbyUpdate) -> result.setResult((LobbyUpdateDto)lobbyUpdate));
+
         return result;
     }
 
@@ -55,35 +61,35 @@ public class LobbyController {
     }
 
     @PostMapping("/leaveLobby")
-    public void leaveLobby() {
-        Collection<PlayerDto> toDelete = new LinkedList<>();
-        toDelete.add(new PlayerDto(getCurrentPlayerName()));
-        lobbyManager.removePlayers(toDelete);
+    public DeferredResult<Boolean> leaveLobby() {
+        DeferredResult<Boolean> result = new DeferredResult<>();
+
+        ForkJoinPool.commonPool().execute(() -> {
+            String myName = getCurrentPlayerName();
+            Iterable<PlayerDto> toDelete = Collections.singletonList(new PlayerDto(myName));
+            result.setResult(lobbyManager.removePlayers(toDelete));
+        });
+
+        return result;
     }
 
     @PostMapping("/sendChallenge")
-    public void sendChallenge(String challengedPlayer) {
-        ChallengeDto challenge = new ChallengeDto();
-        challenge.setChallenged(lobbyManager.getPlayer(challengedPlayer));
-        challenge.setChallenger(lobbyManager.getPlayer(getCurrentPlayerName()));
-        lobbyManager.addChallenge(challenge);
+    public DeferredResult<Boolean> sendChallenge(String challengedPlayer) {
+        DeferredResult<Boolean> result = new DeferredResult<>();
+
+        String myName = getCurrentPlayerName();
+        ForkJoinPool.commonPool().execute(() -> result.setResult(lobbyManager.addChallenge(myName, challengedPlayer)));
+
+        return result;
     }
 
     @PostMapping("/answerChallenge")
-    public UUID answerChallenge(Boolean isAccepted) {
-        ChallengeDto challenge = lobbyManager.getChallenge(getCurrentPlayerName());
-        if (isAccepted) {
-            UUID gameId = gameManager.createGame(challenge);
-            if (gameId != null) {
-                challenge.setGameID(gameId);
-                lobbyManager.updateChallenge(challenge);
-            } else {
-                lobbyManager.returnPlayersToLobby(challenge);
-            }
-            return gameId;
-        } else {
-            lobbyManager.returnPlayersToLobby(challenge);
-            return null;
-        }
+    public DeferredResult<UUID> answerChallenge(Boolean isAccepted) {
+        DeferredResult<UUID> result = new DeferredResult<>();
+
+        String myName = getCurrentPlayerName();
+        ForkJoinPool.commonPool().execute(() -> result.setResult(lobbyManager.updateChallenge(myName, isAccepted)));
+
+        return result;
     }
 }

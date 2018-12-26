@@ -109,15 +109,15 @@ function AbaloneViewModel() {
             if (!ourChallenge) {
                 updatePlayers(lobby.players);
                 self.goToLobby();
-            } else if (ourChallenge.gameId) {
-                self.loadGame(ourChallenge.gameId);
+            } else if (ourChallenge.gameID) {
+                self.loadGame(ourChallenge.gameID);
             }
         }
         Requests.getLobbyUpdate(self.updateLobby, self.handleError);
     };
 
     this.sendChallenge = function (player) {
-        self.challenged(player.name)
+        self.challenged(player.name);
         Requests.sendChallenge(player.name, self.goToWaiting, self.handleError);
     };
 

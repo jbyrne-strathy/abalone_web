@@ -10,22 +10,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.concurrent.ForkJoinPool;
+
 /**
  * Created by james on 20/06/17.
  */
 @RestController
 @RequestMapping("/")
 public class AccessController {
-    @Autowired
-    private PlayerRepository playerRepository;
+    private final PlayerRepository playerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AccessController(PlayerRepository playerRepository, PasswordEncoder passwordEncoder) {
+        this.playerRepository = playerRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/createAccount")
     public DeferredResult<Boolean> createAccount(CreatePlayerDto createPlayerDto) {
         DeferredResult<Boolean> result = new DeferredResult<>();
-        new Thread(() -> createAccountDeferred(createPlayerDto, result)).run();
+
+        ForkJoinPool.commonPool().execute(() -> createAccountDeferred(createPlayerDto, result));
+
         return result;
     }
 

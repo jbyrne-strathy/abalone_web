@@ -10,17 +10,24 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.websocket.server.PathParam;
 import java.util.UUID;
+import java.util.concurrent.ForkJoinPool;
 
 @RestController
 @RequestMapping("/game")
 public class GameController {
+    private final GameManager gameManager;
+
     @Autowired
-    private GameManager gameManager;
+    public GameController(GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
 
     @GetMapping("/loadGame")
     public DeferredResult<GameStateDto> loadGame(@PathParam("id") String id) {
         DeferredResult<GameStateDto> result = new DeferredResult<>();
-        new Thread(() -> result.setResult(gameManager.getGame(UUID.fromString(id)))).start();
+
+        ForkJoinPool.commonPool().execute(() -> result.setResult(gameManager.getGame(UUID.fromString(id))));
+
         return result;
     }
 }
