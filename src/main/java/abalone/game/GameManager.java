@@ -15,10 +15,14 @@ import java.util.UUID;
 
 @Component
 public class GameManager {
-    private SortedMap<UUID, GameStateDto> games = Collections.synchronizedSortedMap(new TreeMap<>());
+    private final SortedMap<UUID, GameStateDto> games;
 
     @Value("${abalone.layouts.default}")
     private String defaultLayout;
+
+    public GameManager() {
+        this.games = Collections.synchronizedSortedMap(new TreeMap<>());
+    }
 
     public UUID createGame(ChallengeDto challengeDto) {
         try {

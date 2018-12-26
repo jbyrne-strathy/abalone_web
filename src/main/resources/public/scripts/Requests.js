@@ -1,28 +1,4 @@
-var Requests = {
-    joinLobby: function (successHandler, errorHandler) {
-        $.get({
-            url: "/lobby/joinLobby",
-            headers: {Authorization: "Bearer " + sessionStorage.token}
-        }).then(successHandler, errorHandler);
-    },
-    getLobbyUpdate: function (successHandler, errorHandler) {
-        $.get({
-            url: "/lobby/getLobbyUpdates",
-            headers: {Authorization: "Bearer " + sessionStorage.token}
-        }).then(successHandler, errorHandler);
-    },
-    getLeaderboard: function (successHandler, errorHandler) {
-        $.get({
-            url: "/lobby/getLeaderboard",
-            headers: {Authorization: "Bearer " + sessionStorage.token}
-        }).then(successHandler, errorHandler);
-    },
-    getLeaderboardUpdates: function (successHandler, errorHandler) {
-        $.get({
-            url: "/lobby/getLeaderboardUpdates",
-            headers: {Authorization: "Bearer " + sessionStorage.token}
-        }).then(successHandler, errorHandler);
-    },
+const Requests = {
     login: function (username, password, successHandler, errorHandler) {
         $.post("/login", {username: username, password: password})
             .then(successHandler, errorHandler);
@@ -34,15 +10,39 @@ var Requests = {
     leaveLobby: function () {
         $.ajax({
             method: "post",
-            url: "/lobby/leaveLobby",
+            url: "/game/leaveLobby",
             headers: {Authorization: "Bearer " + sessionStorage.token},
             data: {}
         })
     },
+    joinLobby: function (successHandler, errorHandler) {
+        $.get({
+            url: "/game/joinLobby",
+            headers: {Authorization: "Bearer " + sessionStorage.token}
+        }).then(successHandler, errorHandler);
+    },
+    getLobbyUpdate: function (successHandler, errorHandler) {
+        $.get({
+            url: "/game/getLobbyUpdates",
+            headers: {Authorization: "Bearer " + sessionStorage.token}
+        }).then(successHandler, errorHandler);
+    },
+    getLeaderboard: function (successHandler, errorHandler) {
+        $.get({
+            url: "/game/getLeaderboard",
+            headers: {Authorization: "Bearer " + sessionStorage.token}
+        }).then(successHandler, errorHandler);
+    },
+    getLeaderboardUpdates: function (successHandler, errorHandler) {
+        $.get({
+            url: "/game/getLeaderboardUpdates",
+            headers: {Authorization: "Bearer " + sessionStorage.token}
+        }).then(successHandler, errorHandler);
+    },
     sendChallenge: function (target, successHandler, errorHandler) {
         $.ajax({
             method: "post",
-            url: "/lobby/sendChallenge",
+            url: "/game/sendChallenge",
             headers: {Authorization: "Bearer " + sessionStorage.token},
             data: {challengedPlayer: target}
         }).then(successHandler, errorHandler);
@@ -50,7 +50,7 @@ var Requests = {
     answerChallenge: function (isAccepted, successHandler, errorHandler) {
         $.ajax({
             method: "post",
-            url: "/lobby/answerChallenge",
+            url: "/game/answerChallenge",
             headers: {Authorization: "Bearer " + sessionStorage.token},
             data: {isAccepted: isAccepted}
         }).then(successHandler, errorHandler);
@@ -61,4 +61,4 @@ var Requests = {
             headers: {Authorization: "Bearer " + sessionStorage.token}
         }).then(successHandler, errorHandler);
     }
-}
+};

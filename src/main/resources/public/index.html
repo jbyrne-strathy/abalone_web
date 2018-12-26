@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="UTF-8"/>
 	<meta http-equiv="x-ua-compatible" content="ie=edge"/>
 	<title>Abalone</title>
 	<meta name="description" content=""/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<link rel="stylesheet" href="/css/normalize.css"/>
-	<link rel="stylesheet" href="/css/main.css"/>
+	<link rel="stylesheet" href="./css/normalize.css"/>
+	<link rel="stylesheet" href="./css/main.css"/>
 	<!--<script>
         window.fbAsyncInit = function() {
             FB.init({
@@ -35,19 +35,19 @@
 	<!--<script src="../scripts/model.js"></script>-->
 
 	<!-- For development. -->
-	<script src="/scripts/libraries/knockout-3.4.2.js"></script>
-	<script src="/scripts/libraries/modernizr-2.8.3.min.js"></script>
-	<script src="/scripts/libraries/plugins.js"></script>
-	<script src="/scripts/libraries/jquery-3.2.1.min.js"></script>
-	<script src="/scripts/libraries/easeljs-0.8.2.min.js"></script>
-	<script src="/scripts/model/Space.js"></script>
-	<script src="/scripts/model/Marble.js"></script>
-	<script src="/scripts/controller/PlayerUtils.js"></script>
-	<script src="/scripts/controller/HumanPlayer.js"></script>
-	<script src="/scripts/controller/RemotePlayer.js"></script>
-	<script src="/scripts/controller/AIPlayer.js"></script>
-	<script src="/scripts/Constants.js"></script>
-	<script src="/scripts/Requests.js"></script>
+	<script src="./scripts/libraries/knockout-3.4.2.js"></script>
+	<script src="./scripts/libraries/modernizr-2.8.3.min.js"></script>
+	<script src="./scripts/libraries/plugins.js"></script>
+	<script src="./scripts/libraries/jquery-3.2.1.min.js"></script>
+	<script src="./scripts/libraries/easeljs-0.8.2.min.js"></script>
+	<script src="./scripts/model/Space.js"></script>
+	<script src="./scripts/model/Marble.js"></script>
+	<script src="./scripts/controller/PlayerUtils.js"></script>
+	<script src="./scripts/controller/HumanPlayer.js"></script>
+	<script src="./scripts/controller/RemotePlayer.js"></script>
+	<script src="./scripts/controller/AIPlayer.js"></script>
+	<script src="./scripts/Constants.js"></script>
+	<script src="./scripts/Requests.js"></script>
 </head>
 <body style="margin-top: 0; margin-bottom: 0" data-bind="event: {load: init, beforeunload: leaveLobby}">
 <!--[if lt IE 8]>
@@ -111,7 +111,7 @@
 <!-- /ko -->
 <!-- ko if: visibleSection() === Constants.sections.leaderboard -->
 <div id="leaderboard">
-	<p><button onclick="goToLobby()">Go to Lobby</button></p>
+	<p><button data-bind="click: goToLobby">Go to Lobby</button></p>
 	<table id="leagueTable">
 		<thead>
 		<tr>
@@ -132,5 +132,5 @@
 </div>
 <!-- /ko -->
 </body>
-<script src="/scripts/AbaloneViewModel.js"></script>
+<script src="./scripts/AbaloneViewModel.js"></script>
 </html>

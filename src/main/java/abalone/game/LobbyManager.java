@@ -4,7 +4,6 @@ import abalone.dto.ChallengeDto;
 import abalone.dto.LobbyUpdateDto;
 import abalone.dto.PlayerDto;
 import lombok.Synchronized;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -14,18 +13,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class LobbyManager extends Observable {
-    private final GameManager gameManager;
     private final Set<PlayerDto> players;
     private final SortedMap<String, ChallengeDto> challenges;
 
-    @Autowired
-    public LobbyManager(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public LobbyManager() {
         this.players = Collections.synchronizedSet(new HashSet<>());
         this.challenges = Collections.synchronizedSortedMap(new TreeMap<>());
     }
@@ -35,21 +30,6 @@ public class LobbyManager extends Observable {
         setChanged();
         notifyObservers(getLobby());
         deleteObservers();
-    }
-
-    private void removeChallenge (String challenged) {
-        challenges.remove(challenged);
-        sendUpdates();
-    }
-
-    private void returnPlayersToLobby(ChallengeDto challenge) {
-        players.add(challenge.getChallenger());
-        players.add(challenge.getChallenged());
-        removeChallenge(challenge.getChallenged().getName());
-    }
-
-    private ChallengeDto getChallenge (String challenged) {
-        return challenges.get(challenged);
     }
 
     private PlayerDto getPlayer(String name) {
@@ -62,6 +42,16 @@ public class LobbyManager extends Observable {
         lobbyUpdateDto.setPlayers(players);
         lobbyUpdateDto.setChallenges(challenges.values());
         return lobbyUpdateDto;
+    }
+
+    public void returnPlayersToLobby(ChallengeDto challenge) {
+        players.add(challenge.getChallenger());
+        players.add(challenge.getChallenged());
+        removeChallenge(challenge.getChallenged().getName());
+    }
+
+    public ChallengeDto getChallenge (String challenged) {
+        return challenges.get(challenged);
     }
 
     public LobbyUpdateDto addPlayer(PlayerDto player) {
@@ -87,24 +77,14 @@ public class LobbyManager extends Observable {
         return true;
     }
 
-    public UUID updateChallenge (String challenged, boolean isAccepted){
-        ChallengeDto challenge = getChallenge(challenged);
-        UUID gameId = null;
-
-        if (isAccepted) {
-            gameId = gameManager.createGame(challenge);
-            if (gameId != null) {
-                challenge.setGameID(gameId);
-                challenges.put(challenge.getChallenged().getName(), challenge);
-            } else {
-                returnPlayersToLobby(challenge);
-            }
-        } else {
-            returnPlayersToLobby(challenge);
-        }
-
+    public void updateChallenge (ChallengeDto challenge){
+        challenges.put(challenge.getChallenged().getName(), challenge);
         sendUpdates();
-        return gameId;
+    }
+
+    public void removeChallenge (String challenged) {
+        challenges.remove(challenged);
+        sendUpdates();
     }
 
     public boolean removePlayers(Iterable<PlayerDto> playersToRemove) {
