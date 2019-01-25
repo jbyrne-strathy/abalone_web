@@ -41,5 +41,5 @@ Space.prototype.setMarble = function (marble) {
 };
 
 Space.prototype.isOffBoard = function () {
-    return this.id.indexOf("out") != -1;
+    return this.id.indexOf("out") !== -1;
 };

@@ -2,12 +2,13 @@ function Marble (space, player, pressmove, pressup, mousedown) {
     const self = this;
 
     if (typeof pressmove !== 'function'
-            || typeof pressup !== 'function'
-            || typeof mousedown !== 'function') {
+        || typeof pressup !== 'function'
+        || typeof mousedown !== 'function') {
         throw "pressmove, pressup and mousedown must be functions";
     }
     this.space = space;
     this.player = player;
+    this.isSelected = false;
     switch(player){
         case 1:
             this.color = Constants.player1Color;
@@ -24,19 +25,25 @@ function Marble (space, player, pressmove, pressup, mousedown) {
     this.circle.x = space.getX();
     this.circle.y = space.getY();
     this.circle.graphics
-        .beginStroke(this.lineColor)
         .beginFill(this.color)
-        .drawCircle(0, 0, Constants.marbleRadius);
+        .drawCircle(0, 0, Constants.marbleRadius)
+        .endFill();
 
-    this.circle.on("pressmove", pressmove);
-    this.circle.on("pressup", pressup);
-    this.circle.on("mousedown", mousedown);
+    this.circle.on("pressmove", function (event){
+        pressmove(self, event);
+    });
+    this.circle.on("pressup", function (event){
+        pressup(self, event);
+    });
+    this.circle.on("mousedown", function (event){
+        mousedown(self, event);
+    });
     return this;
 }
 
 Marble.prototype.getCircle = function () {
     return this.circle;
-}
+};
 
 Marble.prototype.getX = function () {
     return this.circle.x;
@@ -47,7 +54,7 @@ Marble.prototype.getY = function () {
 };
 
 Marble.prototype.getPlayer = function () {
-   return this.player;
+    return this.player;
 };
 
 Marble.prototype.getSpace = function () {
@@ -67,21 +74,18 @@ Marble.prototype.setPos = function (newX, newY) {
     /*console.log(newX + ", " + newY)*/
     this.circle.x = newX;
     this.circle.y = newY;
-    window.stage.update();
 };
 
 Marble.prototype.move = function (xTransform, yTransform) {
     this.circle.x = this.space.getX() + xTransform;
     this.circle.y = this.space.getY() + yTransform;
     //console.log(this.circle.x + ", " + this.circle.y);
-    window.stage.update();
 };
 
 Marble.prototype.animate = function (xTransform, yTransform) {
     this.circle.x += xTransform;
     this.circle.y += yTransform;
     //console.log(this.circle.x + ", " + this.circle.y);
-    window.stage.update();
 };
 
 Marble.prototype.remove = function () {
@@ -89,6 +93,31 @@ Marble.prototype.remove = function () {
         this.getSpace().setMarble(null);
     }
     this.unsetSpace();
-    window.stage.removeChild(this.circle);
-    window.stage.update();
+};
+
+Marble.prototype.isSelected = function () {
+    return this.isSelected;
+};
+
+Marble.prototype.select = function () {
+    this.circle.graphics
+        .clear()
+        .setStrokeStyle(5)
+        .beginStroke(Constants.selectedMarbleColor)
+        .beginFill(this.color)
+        .drawCircle(0, 0, Constants.marbleRadius)
+        .endFill()
+        .endStroke();
+    this.isSelected = true;
+};
+
+Marble.prototype.deselect = function () {
+    this.circle.graphics
+        .clear()
+        .beginStroke(this.lineColor)
+        .beginFill(this.color)
+        .drawCircle(0, 0, Constants.marbleRadius)
+        .endFill()
+        .endStroke();
+    this.isSelected = false;
 };

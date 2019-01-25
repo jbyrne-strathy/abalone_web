@@ -189,18 +189,19 @@ function AbaloneViewModel() {
         } catch (error) {
             // Ignore it.
         }
-        self.selectedMarbles.draw();
     };
 
     this.addPushedMarble = function (marble) {
-        if(!self.pushedMarbles.contains(marble)) {
+        if(!self.pushedMarbles.includes(marble)) {
             self.pushedMarbles.push(marble);
         }
     };
 
     this.addSelectedMarble = function (marble) {
-        if(!self.selectedMarbles.contains(marble)) {
+        if(!self.selectedMarbles.includes(marble)) {
             self.selectedMarbles.push(marble);
+            marble.select();
+            self.stage.update();
         }
     };
 
@@ -212,6 +213,8 @@ function AbaloneViewModel() {
     this.removeSelectedMarble = function (marble) {
         let i = self.selectedMarbles.indexOf(marble);
         self.selectedMarbles.splice(i, 1);
+        marble.deselect();
+        self.stage.update();
     };
 
     this.drawSelectedMarbles = function () {
@@ -503,7 +506,7 @@ function AbaloneViewModel() {
         window.onresize = self.configureWindow;
         self.configureWindow();
 
-        if (gameState.player1Name === sessionStorage.name) {
+        if (gameState.player1.name === sessionStorage.name) {
             self.myNumber = 1;
             self.isMyTurn = true;
         } else {
@@ -558,6 +561,7 @@ function AbaloneViewModel() {
                             let onLines = self.getLinesForSpace(marble.getSpace());
                             if (self.selectedMarbles.length === 3) {
                                 // 3 marbles already selected.  Deselect all
+                                self.selectedMarbles.forEach(marble => marble.deselect());
                                 self.selectedMarbles = [];
                             } else if (self.selectedMarbles.length === 2) {
                                 // 2 marbles already selected.  Is selected marble inline?
@@ -565,15 +569,17 @@ function AbaloneViewModel() {
                                 let selectedLine = self.getLineForSpaces(self.selectedMarbles[0].getSpace(), self.selectedMarbles[1].getSpace());
                                 if (onLines.indexOf(selectedLine) === -1) {
                                     // Current marble is not in-line with selected marbles.
+                                    self.selectedMarbles.forEach(marble => marble.deselect());
                                     self.selectedMarbles = [];
                                 } else {
                                     // Check whether the marble is a neighbour and inline with both selected marbles
                                     let i0 = selectedLine.indexOf(self.selectedMarbles[0].getSpace());
                                     let i1 = selectedLine.indexOf(self.selectedMarbles[1].getSpace());
                                     if ((selectedLine[i0 - 1] === null || selectedLine[i0 - 1].getId() !== marble.getSpace().getId())
-                                            && (selectedLine[i0 + 1] === null || selectedLine[i0 + 1].getId() !== marble.getSpace().getId())
-                                            && (selectedLine[i1 - 1] === null || selectedLine[i1 - 1].getId() !== marble.getSpace().getId())
-                                            && (selectedLine[i1 + 1] === null || selectedLine[i1 + 1].getId() !== marble.getSpace().getId())) {
+                                        && (selectedLine[i0 + 1] === null || selectedLine[i0 + 1].getId() !== marble.getSpace().getId())
+                                        && (selectedLine[i1 - 1] === null || selectedLine[i1 - 1].getId() !== marble.getSpace().getId())
+                                        && (selectedLine[i1 + 1] === null || selectedLine[i1 + 1].getId() !== marble.getSpace().getId())) {
+                                        self.selectedMarbles.forEach(marble => marble.deselect());
                                         self.selectedMarbles = [];
                                     }
                                 }
@@ -589,6 +595,7 @@ function AbaloneViewModel() {
 
                                 };
                                 if (!isNeighbour(0) && !isNeighbour(1) && !isNeighbour(2)) {
+                                    self.selectedMarbles.forEach(marble => marble.deselect());
                                     self.selectedMarbles = [];
                                 }
                             }
@@ -659,6 +666,7 @@ function AbaloneViewModel() {
                         if (targetSpace.isOffBoard()) {
                             //console.log("Gone to offboard? " + targetSpace.getId());
                             marble.remove();
+                            self.stage.removeChild(marble);
                         } else {
                             //console.log("Player " + marble.getPlayer() + ": " + marble.getSpace().getId() + " -> " + targetSpace.getId());
                             if(marble.getSpace().getMarble() === marble) {
@@ -686,7 +694,13 @@ function AbaloneViewModel() {
                     self.pushedMarbles = [];
 
                     // Notify the backend player controller.
-                    HumanPlayer.makeMove(moves);
+                    self.updateState(moves);
+
+                    // TODO Send moves to server
+
+                    if (self.isGameOver()) {
+                        self.endGame();
+                    }
                 }
                 self.dragged = false;
                 self.stage.update();
@@ -752,7 +766,7 @@ function AbaloneViewModel() {
                     inline = false; // Only a single marble.
                 } else {
                     if (line.indexOf(self.selectedMarbles[0].getSpace()) === -1
-                            || line.indexOf(self.selectedMarbles[1].getSpace()) === -1) {
+                        || line.indexOf(self.selectedMarbles[1].getSpace()) === -1) {
                         inline = false; // If draggine marles inline, all 3 marbles will be in the same line
                     }
                 }
@@ -847,6 +861,8 @@ function AbaloneViewModel() {
             if (!self.isValidDrag) {
                 self.resetMarbles();
             }
+
+            self.stage.update();
         }
     };
 
@@ -902,6 +918,119 @@ function AbaloneViewModel() {
             marble.setPos(marble.getSpace().getX(), marble.getSpace().getY());
         }
         self.pushedMarbles = [];
+    };
+
+    /* MOVE COMPLETION HANDLERS */
+
+    this.updateState = function (moves) {
+        // Update game state with move
+        let marbles = [];
+        // Clear the spaces previously occupied by each marble.
+        moves.forEach(move => {
+            marbles.push( self.gameState.board[move.from] );
+            self.gameState.board[move.from] = 0;
+        });
+        // Now set the moved marbles to their new spaces.
+        moves.forEach(move => {
+            if (self.offBoard[move.to] !== undefined) {
+                // When marble pushed off, increment the other player's score and strength.
+                let pushedOutPlayer = marbles.shift();
+                if(pushedOutPlayer === 1) {
+                    self.player2Score = (self.gameState.player2.score++).toString();
+                } else if(pushedOutPlayer === 2) {
+                    self.player1Score = (self.gameState.player1.score++).toString();
+                }
+            } else {
+                // Put marble in its new space.
+                self.gameState.board[move.to] = marbles.shift();
+            }
+        });
+        console.log(self.gameState.board);
+
+        if (self.gameState.currentPlayer === 1) {
+            self.gameState.currentPlayer = 2;
+        } else if (self.gameState.currentPlayer === 2) {
+            self.gameState.currentPlayer = 1;
+        }
+
+        self.isMyTurn = self.myNumber === self.gameState.currentPlayer;
+
+        if (self.gameState.player1.score === 6) {
+            self.gameState.winner = 1;
+        } else if (self.gameState.player2.score === 6) {
+            self.gameState.winner = 2;
+        }
+    };
+
+    this.updateStateFromRemote = function (moves, gameStateHash) {
+        // TODO Validate GameState matches our GameState.
+        self.animateMove(moves);
+        self.updateState(moves);
+        self.isMyTurn = true;
+        if (self.isGameOver()) {
+            self.endGame();
+        }
+    };
+
+    this.animateMove = function (moves) {
+        let movingMarbles = [];
+        let from = [];
+        let to = [];
+        moves.forEach(marbleMove => {
+            for (let space in self.spaces) {
+                if (self.spaces.hasOwnProperty(space)) {
+                    if (space === marbleMove.from) {
+                        movingMarbles.push(space.getMarble());
+                        from.push(space);
+                        break; // No need to continue searching spaces.
+                    }
+                }
+            }
+        });
+        moves.forEach(marbleMove => {
+            let spaces = {};
+            if ( !self.spaces[marbleMove.to].isOffBoard() ) {
+                spaces = self.spaces;
+            } else {
+                spaces = self.offBoard;
+            }
+            spaces.foreach(space => {
+                if (self.spaces.hasOwnProperty(space)) {
+                    if (space === marbleMove.to) {
+                        to.push(space);
+                        return false; // No need to continue searching spaces.
+                    }
+                }
+            });
+        });
+        if (to[0] === undefined) {
+            throw "to[0] is undefined!"; // Just to catch an error in debugging. Remove this.
+        }
+        let xChange = (to[0].getX() - from[0].getX())/30;
+        let yChange = (to[0].getY() - from[0].getY())/30;
+
+        // Move the marbles
+        let count = 0;
+        let timer = window.setInterval(function() {
+            if (count === 30) {
+                movingMarbles.forEach((marble, i) => {
+                    marble.setPos( to[i].getX(), to[i].getY() );
+                    if(marble.getSpace().getMarble() === marble) {
+                        marble.getSpace().setMarble(null);
+                    }
+                    marble.setSpace(to[i]);
+                    to[i].setMarble(marble);
+                });
+                window.clearInterval(timer);
+            } else {
+                movingMarbles.forEach(marble => marble.animate(xChange, yChange));
+                count++;
+            }
+        }, 30 );
+    };
+
+    this.isGameOver = function () {
+        return self.gameState.winner !== 0;
     };
 
     /* INIT */
