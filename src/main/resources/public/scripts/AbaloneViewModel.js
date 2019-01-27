@@ -790,7 +790,7 @@ function AbaloneViewModel() {
                         } else {
                             if (pushMarble.getPlayer() === self.currentMarble.getPlayer()) {
                                 // Don't move to space occupied by own unselected marble.
-                                if (!self.selectedMarbles.indexOf(pushMarble) > -1) {
+                                if (self.selectedMarbles.indexOf(pushMarble) === -1) {
                                     self.isValidDrag = false;
                                     break;
                                 }
@@ -1003,9 +1003,7 @@ function AbaloneViewModel() {
                 }
             });
         });
-        if (to[0] === undefined) {
-            throw "to[0] is undefined!"; // Just to catch an error in debugging. Remove this.
-        }
+
         let xChange = (to[0].getX() - from[0].getX())/30;
         let yChange = (to[0].getY() - from[0].getY())/30;
 
