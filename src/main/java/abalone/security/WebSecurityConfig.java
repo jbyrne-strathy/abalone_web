@@ -23,6 +23,15 @@ import static abalone.security.SecurityConstants.SIGN_UP_URL;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public WebSecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
@@ -37,12 +46,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // this disables session creation on Spring Security
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {

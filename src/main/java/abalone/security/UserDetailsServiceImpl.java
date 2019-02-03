@@ -13,8 +13,12 @@ import static java.util.Collections.emptyList;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+    private final PlayerRepository playerRepository;
+
     @Autowired
-    private PlayerRepository playerRepository;
+    public UserDetailsServiceImpl (PlayerRepository playerRepository) {
+        this.playerRepository = playerRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
