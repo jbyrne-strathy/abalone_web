@@ -1,7 +1,7 @@
 package abalone.rest;
 
-import abalone.database.entity.Player;
-import abalone.database.repository.PlayerRepository;
+import abalone.entity.Player;
+import abalone.repository.PlayerRepository;
 import abalone.dto.CreatePlayerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,9 +40,9 @@ public class AccessController {
         int count = playerRepository.count( createPlayerDto.getUsername() );
         System.out.println("Count: " + count);
         if ( count == 0 ) {
-            Player newPlayer = new Player(createPlayerDto.getUsername(), passwordEncoder.encode(createPlayerDto.getPassword()));
-            System.out.println(newPlayer.getUsername());
-            System.out.println(newPlayer.getPassword());
+            Player newPlayer = new Player();
+            newPlayer.setUsername(createPlayerDto.getUsername());
+            newPlayer.setPassword(passwordEncoder.encode(createPlayerDto.getPassword()));
 
             playerRepository.save(newPlayer);
             result.setResult(true);

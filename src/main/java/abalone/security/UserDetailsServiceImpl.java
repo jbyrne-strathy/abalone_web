@@ -1,7 +1,7 @@
 package abalone.security;
 
-import abalone.database.entity.Player;
-import abalone.database.repository.PlayerRepository;
+import abalone.entity.Player;
+import abalone.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

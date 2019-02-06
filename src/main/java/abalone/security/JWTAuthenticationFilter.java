@@ -1,6 +1,6 @@
 package abalone.security;
 
-import abalone.database.entity.Player;
+import abalone.entity.Player;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;

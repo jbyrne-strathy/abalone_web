@@ -1,4 +1,4 @@
-package abalone.security;
+package abalone.bean;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

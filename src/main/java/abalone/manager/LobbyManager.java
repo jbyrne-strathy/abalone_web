@@ -1,4 +1,4 @@
-package abalone.game;
+package abalone.manager;
 
 import abalone.dto.ChallengeDto;
 import abalone.dto.LobbyUpdateDto;
