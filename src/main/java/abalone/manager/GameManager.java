@@ -1,9 +1,9 @@
 package abalone.manager;
 
-import abalone.dto.BoardDto;
-import abalone.dto.ChallengeDto;
-import abalone.dto.GameStateDto;
+import abalone.entity.Challenge;
+import abalone.entity.GameState;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Component
 public class GameManager {
-    private final SortedMap<UUID, GameStateDto> games;
+    private final SortedMap<UUID, GameState> games;
 
     @Value("${abalone.layouts.default}")
     private String defaultLayout;
@@ -24,12 +24,15 @@ public class GameManager {
         this.games = Collections.synchronizedSortedMap(new TreeMap<>());
     }
 
-    public UUID createGame(ChallengeDto challengeDto) {
+    public UUID createGame(Challenge challenge) {
         try {
-            GameStateDto newGame = new GameStateDto();
-            newGame.setPlayer1(challengeDto.getChallenger());
-            newGame.setPlayer2(challengeDto.getChallenged());
-            newGame.setBoard(new ObjectMapper().readValue(defaultLayout, BoardDto.class));
+            GameState newGame = new GameState();
+            newGame.setPlayer1(challenge.getChallenger());
+            newGame.setPlayer2(challenge.getChallenged());
+
+            ObjectMapper mapper = new ObjectMapper();
+            MapType mapType = mapper.getTypeFactory().constructMapType(SortedMap.class, String.class, Integer.class);
+            newGame.setBoard(mapper.readValue(defaultLayout, mapType));
 
             games.put(newGame.getId(), newGame);
 
@@ -39,11 +42,11 @@ public class GameManager {
         }
     }
 
-    public GameStateDto removeGame(GameStateDto game) {
+    public GameState removeGame(GameState game) {
         return games.remove(game.getId());
     }
 
-    public GameStateDto getGame(UUID id) {
+    public GameState getGame(UUID id) {
         return games.get(id);
     }
 }

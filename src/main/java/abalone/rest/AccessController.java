@@ -1,6 +1,7 @@
 package abalone.rest;
 
 import abalone.entity.Player;
+import abalone.mapper.EntityDtoMapper;
 import abalone.repository.PlayerRepository;
 import abalone.dto.CreatePlayerDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,13 @@ public class AccessController {
     private final PlayerRepository playerRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final EntityDtoMapper entityDtoMapper;
+
     @Autowired
-    public AccessController(PlayerRepository playerRepository, PasswordEncoder passwordEncoder) {
+    public AccessController(PlayerRepository playerRepository, PasswordEncoder passwordEncoder, EntityDtoMapper entityDtoMapper) {
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.entityDtoMapper = entityDtoMapper;
     }
 
     @PostMapping("/createAccount")
@@ -40,9 +44,8 @@ public class AccessController {
         int count = playerRepository.count( createPlayerDto.getUsername() );
         System.out.println("Count: " + count);
         if ( count == 0 ) {
-            Player newPlayer = new Player();
-            newPlayer.setUsername(createPlayerDto.getUsername());
-            newPlayer.setPassword(passwordEncoder.encode(createPlayerDto.getPassword()));
+            Player newPlayer = entityDtoMapper.dtoToEntity(createPlayerDto);
+            newPlayer.setPassword(passwordEncoder.encode(newPlayer.getPassword()));
 
             playerRepository.save(newPlayer);
             result.setResult(true);

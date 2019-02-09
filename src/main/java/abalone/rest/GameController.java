@@ -1,11 +1,15 @@
 package abalone.rest;
 
-import abalone.dto.ChallengeDto;
 import abalone.dto.GameStateDto;
 import abalone.dto.LobbyUpdateDto;
 import abalone.dto.PlayerDto;
+import abalone.entity.Challenge;
+import abalone.entity.GameState;
+import abalone.entity.LobbyUpdate;
+import abalone.entity.Player;
 import abalone.manager.GameManager;
 import abalone.manager.LobbyManager;
+import abalone.mapper.EntityDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +32,13 @@ import java.util.concurrent.ForkJoinPool;
 public class GameController {
     private final LobbyManager lobbyManager;
     private final GameManager gameManager;
+    private final EntityDtoMapper entityDtoMapper;
 
     @Autowired
-    public GameController(LobbyManager lobbyManager, GameManager gameManager) {
+    public GameController(LobbyManager lobbyManager, GameManager gameManager, EntityDtoMapper entityDtoMapper) {
         this.lobbyManager = lobbyManager;
         this.gameManager = gameManager;
+        this.entityDtoMapper = entityDtoMapper;
     }
 
     private String getCurrentPlayerName() {
@@ -44,7 +50,15 @@ public class GameController {
         DeferredResult<LobbyUpdateDto> result = new DeferredResult<>();
 
         String myName = getCurrentPlayerName();
-        ForkJoinPool.commonPool().execute(() -> result.setResult(lobbyManager.addPlayer( new PlayerDto( myName ))));
+
+        Player thisPlayer = new Player();
+        thisPlayer.setName(myName);
+        ForkJoinPool.commonPool().execute(() -> {
+            LobbyUpdate lobbyUpdate = lobbyManager.addPlayer(thisPlayer);
+
+            LobbyUpdateDto dto = entityDtoMapper.entityToDto(lobbyUpdate);
+            result.setResult(dto);
+        });
 
         return result;
     }
@@ -53,7 +67,11 @@ public class GameController {
     public DeferredResult<LobbyUpdateDto> getLobbyUpdates() {
         DeferredResult<LobbyUpdateDto> result = new DeferredResult<>(Long.MAX_VALUE);
 
-        lobbyManager.addObserver( (lobby, lobbyUpdate) -> result.setResult((LobbyUpdateDto)lobbyUpdate));
+        lobbyManager.addObserver( (lobby, lobbyUpdate) -> {
+            LobbyUpdate update = (LobbyUpdate)lobbyUpdate;
+
+            result.setResult(entityDtoMapper.entityToDto(update));
+        });
 
         return result;
     }
@@ -72,7 +90,8 @@ public class GameController {
 
         ForkJoinPool.commonPool().execute(() -> {
             String myName = getCurrentPlayerName();
-            Iterable<PlayerDto> toDelete = Collections.singletonList(new PlayerDto(myName));
+
+            Iterable<String> toDelete = Collections.singletonList(myName);
             result.setResult(lobbyManager.removePlayers(toDelete));
         });
 
@@ -96,7 +115,7 @@ public class GameController {
         String myName = getCurrentPlayerName();
         ForkJoinPool.commonPool().execute(() -> {
             UUID gameId = null;
-            ChallengeDto challenge = lobbyManager.getChallenge(myName);
+            Challenge challenge = lobbyManager.getChallenge(myName);
             if (isAccepted) {
                 gameId = gameManager.createGame(challenge);
                 if (gameId != null) {
@@ -119,9 +138,10 @@ public class GameController {
         DeferredResult<GameStateDto> result = new DeferredResult<>();
 
         ForkJoinPool.commonPool().execute(() -> {
-            GameStateDto game = gameManager.getGame(UUID.fromString(id));
+            GameState game = gameManager.getGame(UUID.fromString(id));
             lobbyManager.removeChallenge(game.getPlayer2().getName());
-            result.setResult(game);
+
+            result.setResult(entityDtoMapper.entityToDto(game));
         });
 
         return result;

@@ -1,24 +1,18 @@
 package abalone.manager;
 
-import abalone.dto.ChallengeDto;
-import abalone.dto.LobbyUpdateDto;
-import abalone.dto.PlayerDto;
+import abalone.entity.Challenge;
+import abalone.entity.LobbyUpdate;
+import abalone.entity.Player;
 import lombok.Synchronized;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class LobbyManager extends Observable {
-    private final Set<PlayerDto> players;
-    private final SortedMap<String, ChallengeDto> challenges;
+    private final Set<Player> players;
+    private final SortedMap<String, Challenge> challenges;
 
     public LobbyManager() {
         this.players = Collections.synchronizedSet(new HashSet<>());
@@ -32,29 +26,29 @@ public class LobbyManager extends Observable {
         deleteObservers();
     }
 
-    private PlayerDto getPlayer(String name) {
-        Optional<PlayerDto> player = players.stream().filter(p -> p.getName().equals(name)).findFirst();
+    private Player getPlayer(String name) {
+        Optional<Player> player = players.stream().filter(p -> p.getName().equals(name)).findFirst();
         return player.orElse(null);
     }
 
-    private LobbyUpdateDto getLobby() {
-        LobbyUpdateDto lobbyUpdateDto = new LobbyUpdateDto();
-        lobbyUpdateDto.setPlayers(players);
-        lobbyUpdateDto.setChallenges(challenges.values());
-        return lobbyUpdateDto;
+    private LobbyUpdate getLobby() {
+        LobbyUpdate lobbyUpdate = new LobbyUpdate();
+        lobbyUpdate.setPlayers(players);
+        lobbyUpdate.setChallenges(challenges.values());
+        return lobbyUpdate;
     }
 
-    public void returnPlayersToLobby(ChallengeDto challenge) {
+    public void returnPlayersToLobby(Challenge challenge) {
         players.add(challenge.getChallenger());
         players.add(challenge.getChallenged());
         removeChallenge(challenge.getChallenged().getName());
     }
 
-    public ChallengeDto getChallenge (String challenged) {
+    public Challenge getChallenge (String challenged) {
         return challenges.get(challenged);
     }
 
-    public LobbyUpdateDto addPlayer(PlayerDto player) {
+    public LobbyUpdate addPlayer(Player player) {
         if ( players.add(player) ) {
             sendUpdates();
         }
@@ -62,22 +56,22 @@ public class LobbyManager extends Observable {
     }
 
     public boolean addChallenge(String challenger, String challenged) {
-        ChallengeDto challenge = new ChallengeDto();
+        Challenge challenge = new Challenge();
         challenge.setChallenger(getPlayer(challenger));
         challenge.setChallenged(getPlayer(challenged));
         challenges.put(challenge.getChallenged().getName(), challenge);
 
-        Iterable<PlayerDto> challengePlayers = players.stream().filter(player ->
+        Iterable<String> challengePlayers = players.stream().filter(player ->
             player.getName().equals(challenge.getChallenger().getName())
                     || player.getName().equals(challenge.getChallenged().getName())
-        ).collect(Collectors.toList());
+        ).map(Player::getName).collect(Collectors.toList());
 
         removePlayers(challengePlayers);
 
         return true;
     }
 
-    public void updateChallenge (ChallengeDto challenge){
+    public void updateChallenge (Challenge challenge){
         challenges.put(challenge.getChallenged().getName(), challenge);
         sendUpdates();
     }
@@ -87,10 +81,8 @@ public class LobbyManager extends Observable {
         sendUpdates();
     }
 
-    public boolean removePlayers(Iterable<PlayerDto> playersToRemove) {
-        for (PlayerDto playerDto : playersToRemove) {
-            players.remove(playerDto);
-        }
+    public boolean removePlayers(Iterable<String> playersToRemove) {
+        playersToRemove.forEach(p -> players.removeIf(q -> q.getName().equals(p)));
         sendUpdates();
 
         return true;

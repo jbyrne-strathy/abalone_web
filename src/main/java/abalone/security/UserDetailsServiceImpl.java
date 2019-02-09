@@ -26,6 +26,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (player == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(player.getUsername(), player.getPassword(), emptyList());
+        return new User(player.getName(), player.getPassword(), emptyList());
     }
 }

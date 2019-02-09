@@ -98,51 +98,8 @@
             <id>package</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>net.alchim31.maven</groupId>
-                        <artifactId>yuicompressor-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compress</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <force>true</force>
-                            <nosuffix>true</nosuffix>
-                            <aggregations>
-                                <aggregation>
-                                    <removeIncluded>true</removeIncluded>
-                                    <output>${project.build.directory}/classes/public/abalone.js</output>
-                                    <includes>
-                                        <include>*.js</include>
-                                    </includes>
-                                </aggregation>
-                                <aggregation>
-                                    <removeIncluded>true</removeIncluded>
-                                    <output>${project.build.directory}/classes/public/controllers.js</output>
-                                    <includes>
-                                        <include>controller/*.js</include>
-                                    </includes>
-                                </aggregation>
-                                <aggregation>
-                                    <removeIncluded>true</removeIncluded>
-                                    <output>${project.build.directory}/classes/public/libraries.js</output>
-                                    <includes>
-                                        <include>libraries/*.js</include>
-                                    </includes>
-                                </aggregation>
-                                <aggregation>
-                                    <removeIncluded>true</removeIncluded>
-                                    <output>${project.build.directory}/classes/public/model.js</output>
-                                    <includes>
-                                        <include>model/*.js</include>
-                                    </includes>
-                                </aggregation>
-                            </aggregations>
-                        </configuration>
-                    </plugin>
+                    <!-- TODO Some kind of JS compressor. Grunt maybe?
+                    yuicompressor is way too old. -->
                 </plugins>
             </build>
         </profile>

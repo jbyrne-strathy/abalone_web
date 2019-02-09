@@ -31,12 +31,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
             Player player = new Player();
-            player.setUsername(req.getParameter("username"));
+            player.setName(req.getParameter("username"));
             player.setPassword(req.getParameter("password"));
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            player.getUsername(),
+                            player.getName(),
                             player.getPassword(),
                             new ArrayList<>())
             );

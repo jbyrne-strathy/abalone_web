@@ -1,6 +1,5 @@
 package abalone.entity;
 
-import abalone.dto.PlayerDto;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -11,12 +10,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class Player {
     @Id @NotNull
-    private String username;
+    private String name;
 
     @NotNull
     private String password;
-
-    public PlayerDto toDto() {
-        return new PlayerDto(getUsername());
-    }
 }

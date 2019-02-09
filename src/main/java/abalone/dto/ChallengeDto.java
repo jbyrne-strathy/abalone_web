@@ -1,10 +1,10 @@
 package abalone.dto;
 
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
+@Value
 public class ChallengeDto {
     private PlayerDto challenger;
     private PlayerDto challenged;
