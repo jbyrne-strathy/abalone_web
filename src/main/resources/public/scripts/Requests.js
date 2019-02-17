@@ -60,5 +60,17 @@ const Requests = {
             url: "/game/loadGame?id=" + gameId,
             headers: {Authorization: "Bearer " + sessionStorage.token}
         }).then(successHandler, errorHandler);
+    },
+    makeMove: function (gameId, moves, successHandler, errorHandler) {
+        $.ajax({
+            method: "post",
+            url: "/game/makeMove",
+            headers: {Authorization: "Bearer " + sessionStorage.token},
+            contentType: "application/json",
+            data: JSON.stringify({
+                gameId: gameId,
+                moves: moves
+            })
+        }).then(successHandler, errorHandler);
     }
 };

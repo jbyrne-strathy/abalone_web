@@ -80,7 +80,7 @@ function AbaloneViewModel() {
     this.updateLobby = function (lobby) {
         const updatePlayers = function (players) {
             self.lobby.removeAll();
-            for (i = 0; i < players.length; i++) {
+            for (let i = 0; i < players.length; i++) {
                 if (players[i].name === sessionStorage.name) {
                     players.splice(i, 1);
                     break;
@@ -92,7 +92,7 @@ function AbaloneViewModel() {
             updatePlayers(lobby.players);
 
             if (lobby.challenges) {
-                for (i = 0; i < lobby.challenges.length; i++) {
+                for (let i = 0; i < lobby.challenges.length; i++) {
                     let challenge = lobby.challenges[i];
                     if (challenge.challenged.name === sessionStorage.name) {
                         self.challenger(challenge.challenger.name);
@@ -512,6 +512,7 @@ function AbaloneViewModel() {
         } else {
             self.myNumber = 2;
             self.isMyTurn = false;
+            Requests.makeMove(self.gameState.id, new Array(), self.updateStateFromRemote, self.handleError);
         }
 
         self.finished = false;
@@ -696,7 +697,7 @@ function AbaloneViewModel() {
                     // Notify the backend player controller.
                     self.updateState(moves);
 
-                    // TODO Send moves to server
+                    Requests.makeMove(self.gameState.gameId, moves, self.updateStateFromRemote, self.handleError);
 
                     if (self.isGameOver()) {
                         self.endGame();

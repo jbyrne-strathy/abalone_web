@@ -1,20 +1,13 @@
 package abalone.mapper;
 
 import abalone.dto.*;
-import abalone.entity.Challenge;
-import abalone.entity.GameState;
-import abalone.entity.LobbyUpdate;
-import abalone.entity.Player;
+import abalone.entity.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
 public class EntityDtoMapper {
-    public PlayerDto entityToDto(Player player) {
-        return new PlayerDto(player.getName());
-    }
-
     public Player dtoToEntity(CreatePlayerDto createPlayerDto) {
         Player player = new Player();
 
@@ -22,6 +15,21 @@ public class EntityDtoMapper {
         player.setPassword(createPlayerDto.getPassword());
 
         return player;
+    }
+
+    public Iterable<Move> dtoToEntity(Iterable<MoveDto> moveDtos) {
+        List<Move> moves = new ArrayList<>();
+
+        moveDtos.forEach(moveDto -> {
+            Move move = new Move();
+
+            move.setFrom(moveDto.getFrom());
+            move.setTo(moveDto.getTo());
+
+            moves.add(move);
+        });
+
+        return moves;
     }
 
     public ChallengeDto entityToDto(Challenge challenge) {
@@ -52,5 +60,9 @@ public class EntityDtoMapper {
         lobbyUpdate.getChallenges().forEach(challenge -> challengeDtos.add(entityToDto(challenge)));
 
         return new LobbyUpdateDto(playerDtos, challengeDtos);
+    }
+
+    public PlayerDto entityToDto(Player player) {
+        return new PlayerDto(player.getName());
     }
 }
