@@ -2,16 +2,14 @@ package abalone.manager;
 
 import abalone.entity.Challenge;
 import abalone.entity.GameState;
+import abalone.entity.Move;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class GameManager {
@@ -48,5 +46,13 @@ public class GameManager {
 
     public GameState getGame(UUID id) {
         return games.get(id);
+    }
+
+    public GameState makeMove(UUID gameId, Iterable<Move> moves) {
+        GameState gameState = getGame(gameId);
+        moves.forEach(move -> move.setPlayer(gameState.getMarbleAtSpace(move.getFrom())));
+        moves.forEach(move -> gameState.setMarble(move.getFrom(), 0));
+        moves.forEach(move -> gameState.setMarble(move.getTo(), move.getPlayer()));
+        return gameState;
     }
 }

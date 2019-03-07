@@ -667,7 +667,7 @@ function AbaloneViewModel() {
                         if (targetSpace.isOffBoard()) {
                             //console.log("Gone to offboard? " + targetSpace.getId());
                             marble.remove();
-                            self.stage.removeChild(marble);
+                            self.stage.removeChild(marble.getCircle());
                         } else {
                             //console.log("Player " + marble.getPlayer() + ": " + marble.getSpace().getId() + " -> " + targetSpace.getId());
                             if(marble.getSpace().getMarble() === marble) {
@@ -676,6 +676,7 @@ function AbaloneViewModel() {
                             marble.setSpace(targetSpace);
                             targetSpace.setMarble(marble);
                         }
+                        marble.deselect();
                         /*return true;*/
                     };
                     try {
@@ -697,7 +698,7 @@ function AbaloneViewModel() {
                     // Notify the backend player controller.
                     self.updateState(moves);
 
-                    Requests.makeMove(self.gameState.gameId, moves, self.updateStateFromRemote, self.handleError);
+                    Requests.makeMove(self.gameState.id, moves, self.updateStateFromRemote, self.handleError);
 
                     if (self.isGameOver()) {
                         self.endGame();
@@ -796,7 +797,7 @@ function AbaloneViewModel() {
                                     break;
                                 }
                             } else {
-                                if(self.pushedMarbles.length > -1) {
+                                if(self.pushedMarbles.length > 0) {
                                     // Clear pushed marbles if push direction changed.
                                     let pushIndex = line.indexOf(pushMarble.getSpace());
                                     let heldIndex = line.indexOf(self.pushedMarbles[0].getSpace());
@@ -963,10 +964,10 @@ function AbaloneViewModel() {
         }
     };
 
-    this.updateStateFromRemote = function (moves, gameStateHash) {
+    this.updateStateFromRemote = function (movesDto, gameStateHash) {
         // TODO Validate GameState matches our GameState.
-        self.animateMove(moves);
-        self.updateState(moves);
+        self.animateMove(movesDto.moves);
+        self.updateState(movesDto.moves);
         self.isMyTurn = true;
         if (self.isGameOver()) {
             self.endGame();
@@ -978,13 +979,12 @@ function AbaloneViewModel() {
         let from = [];
         let to = [];
         moves.forEach(marbleMove => {
-            for (let space in self.spaces) {
-                if (self.spaces.hasOwnProperty(space)) {
-                    if (space === marbleMove.from) {
-                        movingMarbles.push(space.getMarble());
-                        from.push(space);
-                        break; // No need to continue searching spaces.
-                    }
+            for (let spaceId in self.spaces) {
+                if (spaceId === marbleMove.from) {
+                    let space = self.spaces[spaceId];
+                    movingMarbles.push(space.marble);
+                    from.push(space);
+                    break; // No need to continue searching spaces.
                 }
             }
         });
@@ -995,14 +995,12 @@ function AbaloneViewModel() {
             } else {
                 spaces = self.offBoard;
             }
-            spaces.foreach(space => {
-                if (self.spaces.hasOwnProperty(space)) {
-                    if (space === marbleMove.to) {
-                        to.push(space);
-                        return false; // No need to continue searching spaces.
-                    }
+            for (let spaceId in spaces) {
+                if (spaceId === marbleMove.to) {
+                    to.push(spaces[spaceId]);
+                    break; // No need to continue searching spaces.
                 }
-            });
+            }
         });
 
         let xChange = (to[0].getX() - from[0].getX())/30;
@@ -1010,9 +1008,9 @@ function AbaloneViewModel() {
 
         // Move the marbles
         let count = 0;
-        let timer = window.setInterval(function() {
+        let timer = window.setInterval(function () {
             if (count === 30) {
-                movingMarbles.forEach((marble, i) => {
+                movingMarbles.forEach(function (marble, i) {
                     marble.setPos( to[i].getX(), to[i].getY() );
                     if(marble.getSpace().getMarble() === marble) {
                         marble.getSpace().setMarble(null);
@@ -1025,6 +1023,7 @@ function AbaloneViewModel() {
                 movingMarbles.forEach(marble => marble.animate(xChange, yChange));
                 count++;
             }
+            self.stage.update();
         }, 30 );
     };
 

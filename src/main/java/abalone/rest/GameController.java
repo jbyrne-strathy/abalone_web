@@ -1,21 +1,13 @@
 package abalone.rest;
 
-import abalone.dto.GameStateDto;
-import abalone.dto.LobbyUpdateDto;
-import abalone.dto.PlayerDto;
-import abalone.entity.Challenge;
-import abalone.entity.GameState;
-import abalone.entity.LobbyUpdate;
-import abalone.entity.Player;
+import abalone.dto.*;
+import abalone.entity.*;
 import abalone.manager.GameManager;
 import abalone.manager.LobbyManager;
 import abalone.mapper.EntityDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.websocket.server.PathParam;
@@ -142,6 +134,22 @@ public class GameController {
             lobbyManager.removeChallenge(game.getPlayer2().getName());
 
             result.setResult(entityDtoMapper.entityToDto(game));
+        });
+
+        return result;
+    }
+
+    @PostMapping("/makeMove")
+    public DeferredResult<MovesDto> makeMove(@RequestBody MovesDto movesDto) {
+        DeferredResult<MovesDto> result = new DeferredResult<>(Long.MAX_VALUE);
+
+        ForkJoinPool.commonPool().execute(() -> {
+            Iterable<Move> moves = entityDtoMapper.dtoToEntity(movesDto.getMoves());
+            GameState gameState = gameManager.makeMove(movesDto.getGameId(), moves);
+
+            gameState.notifyObservers(movesDto);
+            gameState.deleteObservers();
+            gameState.addObserver((game, opponentMoves) -> result.setResult((MovesDto) opponentMoves));
         });
 
         return result;

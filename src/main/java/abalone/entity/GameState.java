@@ -1,12 +1,15 @@
 package abalone.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.util.Observable;
 import java.util.SortedMap;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class GameState {
+public class GameState extends Observable {
     private UUID id;
     private Player player1;
     private Player player2;
@@ -26,17 +29,21 @@ public class GameState {
 
     public void incrementPlayer1score() {
         player1Score++;
+        setChanged();
     }
 
     public void incrementPlayer2score() {
         player2Score++;
+        setChanged();
     }
 
     public void removeMarble(String space) {
         board.put(space, 0);
+        setChanged();
     }
 
     public void setMarble(String space, int player) {
         board.put(space, player);
+        setChanged();
     }
 }
