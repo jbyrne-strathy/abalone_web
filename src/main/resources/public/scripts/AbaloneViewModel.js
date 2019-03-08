@@ -659,7 +659,7 @@ function AbaloneViewModel() {
                         let neighbours = self.getNeighbourSpaces(marble);
                         let targetSpace = self.moveMarbleTo(marble, neighbours, minChangeX, minChangeY);
                         //console.log("neighbours: ", neighbours.toString());
-                        //console.log("targetSpace: ",  üütargetSpace);
+                        //console.log("targetSpace: ", targetSpace);
                         let move = {};
                         move.from = marble.getSpace().getId();
                         move.to = targetSpace.getId();
@@ -990,10 +990,10 @@ function AbaloneViewModel() {
         });
         moves.forEach(marbleMove => {
             let spaces = {};
-            if ( !self.spaces[marbleMove.to].isOffBoard() ) {
-                spaces = self.spaces;
-            } else {
+            if ( marbleMove.to.startsWith("out") ) {
                 spaces = self.offBoard;
+            } else {
+                spaces = self.spaces;
             }
             for (let spaceId in spaces) {
                 if (spaceId === marbleMove.to) {
@@ -1015,8 +1015,12 @@ function AbaloneViewModel() {
                     if(marble.getSpace().getMarble() === marble) {
                         marble.getSpace().setMarble(null);
                     }
-                    marble.setSpace(to[i]);
-                    to[i].setMarble(marble);
+                    if (to[i].isOffBoard()) {
+                        self.stage.removeChild(marble.getCircle());
+                    } else {
+                        marble.setSpace(to[i]);
+                        to[i].setMarble(marble);
+                    }
                 });
                 window.clearInterval(timer);
             } else {
